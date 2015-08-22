@@ -46,17 +46,34 @@ func (r *GridRenderer) Draw(grid *twodee.Grid) {
 		configs = []twodee.SpriteConfig{}
 		x       int32
 		y       int32
+		tditem  twodee.GridItem
+		item    *GridItem
+		ok      bool
 	)
 	for x = 0; x < grid.Width; x++ {
 		for y = 0; y < grid.Height; y++ {
-			configs = append(configs, r.spriteConfig(r.sheet, int(x), int(y)))
+			tditem = grid.Get(x, y)
+			if item, ok = tditem.(*GridItem); !ok {
+				item = nil
+			}
+			configs = append(configs, r.spriteConfig(
+				r.sheet,
+				int(x),
+				int(y),
+				item,
+			))
 		}
 	}
 	r.sprite.Draw(configs)
 }
 
-func (r *GridRenderer) spriteConfig(sheet *twodee.Spritesheet, x, y int) twodee.SpriteConfig {
-	frame := sheet.GetFrame("numbered_squares_00")
+func (r *GridRenderer) spriteConfig(sheet *twodee.Spritesheet, x, y int, item *GridItem) twodee.SpriteConfig {
+	var frame *twodee.SpritesheetFrame
+	if item == nil || item.Passable() {
+		frame = sheet.GetFrame("numbered_squares_00")
+	} else {
+		frame = sheet.GetFrame("numbered_squares_14")
+	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			float32(x) + 0.5, float32(y) + 0.5, 0,

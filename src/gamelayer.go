@@ -36,7 +36,7 @@ func NewGameLayer() (layer *GameLayer, err error) {
 		gridRenderer *GridRenderer
 		grid         *twodee.Grid
 	)
-	grid = twodee.NewGrid(50, 50, 32)
+	grid = twodee.NewGrid(64, 40, PxPerUnit)
 	if err != nil {
 		return
 	}
@@ -44,6 +44,8 @@ func NewGameLayer() (layer *GameLayer, err error) {
 		grid:         grid,
 		gridRenderer: gridRenderer,
 	}
+	grid.Set(4, 19, &GridItem{false})
+	grid.Set(60, 20, &GridItem{false})
 	err = layer.Reset()
 	return
 }
@@ -68,7 +70,7 @@ func (l *GameLayer) Reset() (err error) {
 	)
 	camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(l.grid.Width), float32(l.grid.Height)),
-		twodee.Rect(0, 0, 640, 480),
+		twodee.Rect(0, 0, 1024, 640),
 	)
 	if err = l.loadSpritesheet(); err != nil {
 		return
