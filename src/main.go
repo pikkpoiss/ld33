@@ -28,20 +28,25 @@ func init() {
 }
 
 type Application struct {
-	layers  *twodee.Layers
-	Context *twodee.Context
-	State   *State
+	layers           *twodee.Layers
+	Context          *twodee.Context
+	State            *State
+	GameEventHandler *twodee.GameEventHandler
+	AudioSystem      *AudioSystem
 }
 
 func NewApplication() (app *Application, err error) {
 	var (
-		name      = "LD33"
-		layers    *twodee.Layers
-		context   *twodee.Context
-		gamelayer *GameLayer
-		menulayer *MenuLayer
-		winbounds = twodee.Rect(0, 0, 1024, 640)
-		state     = NewState()
+		name             = "LD33"
+		layers           *twodee.Layers
+		context          *twodee.Context
+		gamelayer        *GameLayer
+		menulayer        *MenuLayer
+		hudlayer         *HudLayer
+		winbounds        = twodee.Rect(0, 0, ScreenWidth, ScreenHeight)
+		state            = NewState()
+		gameEventHandler = twodee.NewGameEventHandler(NumGameEventTypes)
+		audioSystem      *AudioSystem
 	)
 	if context, err = twodee.NewContext(); err != nil {
 		return
@@ -58,11 +63,12 @@ func NewApplication() (app *Application, err error) {
 	context.SetSwapInterval(2)
 	layers = twodee.NewLayers()
 	app = &Application{
-		layers:  layers,
-		Context: context,
-		State:   state,
+		layers:           layers,
+		Context:          context,
+		State:            state,
+		GameEventHandler: gameEventHandler,
 	}
-	if gamelayer, err = NewGameLayer(); err != nil {
+	if gamelayer, err = NewGameLayer(app); err != nil {
 		return
 	}
 	layers.Push(gamelayer)
@@ -70,6 +76,14 @@ func NewApplication() (app *Application, err error) {
 		return
 	}
 	layers.Push(menulayer)
+	if hudlayer, err = NewHudLayer(app); err != nil {
+		return
+	}
+	layers.Push(hudlayer)
+	if audioSystem, err = NewAudioSystem(app); err != nil {
+		return
+	}
+	app.AudioSystem = audioSystem
 	fmt.Printf("OpenGL version: %s\n", context.OpenGLVersion)
 	fmt.Printf("Shader version: %s\n", context.ShaderVersion)
 	return
@@ -87,6 +101,7 @@ func (a *Application) Update(elapsed time.Duration) {
 func (a *Application) Delete() {
 	a.layers.Delete()
 	a.Context.Delete()
+	a.AudioSystem.Delete()
 }
 
 func (a *Application) ProcessEvents() {
@@ -127,6 +142,7 @@ func main() {
 	)
 	for !app.Context.ShouldClose() && !app.State.Exit {
 		app.Context.Events.Poll()
+		app.GameEventHandler.Poll()
 		app.ProcessEvents()
 		for !updated_to.After(current_time) {
 			app.Update(step)

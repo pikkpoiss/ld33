@@ -43,7 +43,7 @@ type Grid struct {
 
 func NewGrid() (g *Grid) {
 	g = &Grid{
-		grid:        twodee.NewGrid(64, 40, 1.0),
+		grid:        twodee.NewGrid(GridWidth, GridHeight, 1.0),
 		defaultItem: &GridItem{true, 0},
 	}
 	g.SetEnter(Ivec2{4, 19})
