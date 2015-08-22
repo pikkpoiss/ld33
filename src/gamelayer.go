@@ -25,10 +25,11 @@ const (
 )
 
 type GameLayer struct {
-	gridRenderer  *GridRenderer
-	spriteSheet   *twodee.Spritesheet
-	spriteTexture *twodee.Texture
-	level         *Level
+	gridRenderer   *GridRenderer
+	spriteSheet    *twodee.Spritesheet
+	spriteTexture  *twodee.Texture
+	level          *Level
+	mouseX, mouseY float32
 }
 
 func NewGameLayer() (layer *GameLayer, err error) {
@@ -58,6 +59,10 @@ func (l *GameLayer) Render() {
 }
 
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
+	switch event := evt.(type) {
+	case *twodee.MouseMoveEvent:
+		l.mouseX, l.mouseY = event.X, event.Y
+	}
 	return true
 }
 
