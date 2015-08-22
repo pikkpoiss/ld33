@@ -42,7 +42,7 @@ func (r *GridRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (r *GridRenderer) Draw(level *Level) {
+func (r *GridRenderer) Draw(level *Level, mousex float32, mousey float32) {
 	var (
 		configs = []twodee.SpriteConfig{}
 		x       int32
@@ -68,12 +68,25 @@ func (r *GridRenderer) Draw(level *Level) {
 			mob,
 		))
 	}
+	configs = append(configs, r.cursorSpriteConfig(r.sheet, mousex, mousey))
 	r.sprite.Draw(configs)
 }
 
+func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, x, y float32) twodee.SpriteConfig {
+	frame := sheet.GetFrame("numbered_squares_08")
+	return twodee.SpriteConfig{
+		View: twodee.ModelViewConfig{
+			x, y, 0,
+			0, 0, 0,
+			1.0, 1.0, 1.0,
+		},
+		Frame: frame.Frame,
+	}
+
+}
+
 func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, x, y float32, mob *Mob) twodee.SpriteConfig {
-	var frame *twodee.SpritesheetFrame
-	frame = sheet.GetFrame("numbered_squares_00")
+	frame := sheet.GetFrame("numbered_squares_00")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			x, y, 0,

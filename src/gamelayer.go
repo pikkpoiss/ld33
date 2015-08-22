@@ -55,7 +55,7 @@ func (l *GameLayer) Delete() {
 
 func (l *GameLayer) Render() {
 	l.spriteTexture.Bind()
-	l.gridRenderer.Draw(l.level)
+	l.gridRenderer.Draw(l.level, l.mouseX, l.mouseY)
 	l.spriteTexture.Unbind()
 }
 
