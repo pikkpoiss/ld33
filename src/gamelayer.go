@@ -25,7 +25,7 @@ const (
 )
 
 type GameLayer struct {
-	gridRenderer   *GridRenderer
+	gameRenderer   *GameRenderer
 	spriteSheet    *twodee.Spritesheet
 	spriteTexture  *twodee.Texture
 	level          *Level
@@ -52,17 +52,18 @@ func NewGameLayer() (layer *GameLayer, err error) {
 }
 
 func (l *GameLayer) Delete() {
-	l.gridRenderer.Delete()
+	l.gameRenderer.Delete()
 }
 
 func (l *GameLayer) Render() {
 	l.spriteTexture.Bind()
-	l.gridRenderer.Draw(l.level)
+	l.gameRenderer.Draw(l.level)
 	l.spriteTexture.Unbind()
 }
 
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	if newState := l.uiState.HandleEvent(l.level, evt); newState != nil {
+		l.uiState.Unregister(l.level)
 		l.uiState = newState
 		l.uiState.Register(l.level)
 	}
@@ -73,7 +74,7 @@ func (l *GameLayer) Reset() (err error) {
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.gridRenderer, err = NewGridRenderer(l.level, l.spriteSheet); err != nil {
+	if l.gameRenderer, err = NewGameRenderer(l.level, l.spriteSheet); err != nil {
 		return
 	}
 	return

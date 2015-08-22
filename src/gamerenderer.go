@@ -20,30 +20,30 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-type GridRenderer struct {
+type GameRenderer struct {
 	sheet  *twodee.Spritesheet
 	sprite *twodee.SpriteRenderer
 }
 
-func NewGridRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GridRenderer, err error) {
+func NewGameRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GameRenderer, err error) {
 	var (
 		sprite *twodee.SpriteRenderer
 	)
 	if sprite, err = twodee.NewSpriteRenderer(level.Camera); err != nil {
 		return
 	}
-	renderer = &GridRenderer{
+	renderer = &GameRenderer{
 		sprite: sprite,
 		sheet:  sheet,
 	}
 	return
 }
 
-func (r *GridRenderer) Delete() {
+func (r *GameRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (r *GridRenderer) Draw(level *Level) {
+func (r *GameRenderer) Draw(level *Level) {
 	var (
 		configs = []twodee.SpriteConfig{}
 		x       int32
@@ -75,7 +75,7 @@ func (r *GridRenderer) Draw(level *Level) {
 	r.sprite.Draw(configs)
 }
 
-func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
+func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
 	frame := sheet.GetFrame(cursor)
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
@@ -87,7 +87,7 @@ func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 	}
 }
 
-func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {
+func (r *GameRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {
 	frame := sheet.GetFrame("numbered_squares_00")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
@@ -99,7 +99,7 @@ func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2,
 	}
 }
 
-func (r *GridRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
+func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
 	if item.Distance() >= 0 && item.Distance() < 15 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))

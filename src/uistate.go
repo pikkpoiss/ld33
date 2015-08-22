@@ -17,10 +17,12 @@ package main
 import (
 	"../lib/twodee"
 	"fmt"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 type UiState interface {
 	Register(level *Level)
+	Unregister(level *Level)
 	HandleEvent(level *Level, evt twodee.Event) UiState
 }
 
@@ -33,6 +35,9 @@ func NewNormalUiState() UiState {
 
 func (s *NormalUiState) Register(level *Level) {
 	level.SetCursor("numbered_squares_01")
+}
+
+func (s *NormalUiState) Unregister(level *Level) {
 }
 
 func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
@@ -52,14 +57,20 @@ func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 }
 
 type BlockUiState struct {
+	Size mgl32.Vec2
 }
 
 func NewBlockUiState() UiState {
-	return &BlockUiState{}
+	return &BlockUiState{
+		mgl32.Vec2{3, 3},
+	}
 }
 
 func (s *BlockUiState) Register(level *Level) {
 	level.SetCursor("numbered_squares_04")
+}
+
+func (s *BlockUiState) Unregister(level *Level) {
 }
 
 func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
