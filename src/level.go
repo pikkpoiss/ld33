@@ -15,14 +15,17 @@
 package main
 
 import (
+	"../lib/twodee"
 	"github.com/go-gl/mathgl/mgl32"
 	"time"
 )
 
 type Level struct {
+	Camera *twodee.Camera
 	Grid           *Grid
 	Mobs           []*Mob
 	ActiveMobCount int
+	MousePos mgl32.Vec2
 }
 
 const (
@@ -30,12 +33,25 @@ const (
 )
 
 func NewLevel() (level *Level, err error) {
-	mobs := make([]*Mob, MaxMobs)
+	var (
+		mobs []*Mob
+		grid *Grid
+		camera *twodee.Camera
+	)
+	mobs = make([]*Mob, MaxMobs)
 	for i := 0; i < MaxMobs; i++ {
 		mobs[i] = &Mob{}
 	}
+	grid = NewGrid()
+	if camera, err = twodee.NewCamera(
+		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
+		twodee.Rect(0, 0, 1024, 640),
+	); err != nil {
+		return
+	}
 	level = &Level{
-		Grid:           NewGrid(),
+		Camera: camera,
+		Grid:           grid,
 		Mobs:           mobs,
 		ActiveMobCount: 0,
 	}
@@ -53,6 +69,15 @@ func (l *Level) Update(elapsed time.Duration) {
 			mob.Update(elapsed, l)
 		}
 	}
+}
+
+func (l *Level) SetMouse(screenX, screenY float32) {
+	x, y := l.Camera.ScreenToWorldCoords(screenX, screenY)
+	l.MousePos = mgl32.Vec2{x, y}
+}
+
+func (l *Level) GetMouse() mgl32.Vec2 {
+	return l.MousePos
 }
 
 func (l *Level) AddMob(pos mgl32.Vec2) {

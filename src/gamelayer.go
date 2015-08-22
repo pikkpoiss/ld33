@@ -16,7 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"github.com/go-gl/mathgl/mgl32"
 	"io/ioutil"
 	"time"
 )
@@ -26,25 +25,24 @@ const (
 )
 
 type GameLayer struct {
-	camera         *twodee.Camera
 	gridRenderer   *GridRenderer
 	spriteSheet    *twodee.Spritesheet
 	spriteTexture  *twodee.Texture
 	level          *Level
+	uiState        UiState
 	mouseX, mouseY float32
 }
 
 func NewGameLayer() (layer *GameLayer, err error) {
 	var (
-		gridRenderer *GridRenderer
-		level        *Level
+		level *Level
 	)
 	if level, err = NewLevel(); err != nil {
 		return
 	}
 	layer = &GameLayer{
-		level:        level,
-		gridRenderer: gridRenderer,
+		level:   level,
+		uiState: NewNormalUiState(),
 	}
 	err = layer.Reset()
 	return
@@ -56,31 +54,22 @@ func (l *GameLayer) Delete() {
 
 func (l *GameLayer) Render() {
 	l.spriteTexture.Bind()
-	l.gridRenderer.Draw(l.level, l.mouseX, l.mouseY)
+	l.gridRenderer.Draw(l.level)
 	l.spriteTexture.Unbind()
 }
 
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
-	switch event := evt.(type) {
-	case *twodee.MouseMoveEvent:
-		l.mouseX, l.mouseY = l.camera.ScreenToWorldCoords(event.X, event.Y)
-	case *twodee.MouseButtonEvent:
-		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
-			l.level.AddMob(mgl32.Vec2{l.mouseX, l.mouseY})
-		}
+	if newState := l.uiState.HandleEvent(l.level, evt); newState != nil {
+		l.uiState = newState
 	}
 	return true
 }
 
 func (l *GameLayer) Reset() (err error) {
-	l.camera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, float32(l.level.Grid.Width()), float32(l.level.Grid.Height())),
-		twodee.Rect(0, 0, 1024, 640),
-	)
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.gridRenderer, err = NewGridRenderer(l.camera, l.spriteSheet); err != nil {
+	if l.gridRenderer, err = NewGridRenderer(l.level, l.spriteSheet); err != nil {
 		return
 	}
 	return

@@ -25,11 +25,11 @@ type GridRenderer struct {
 	sprite *twodee.SpriteRenderer
 }
 
-func NewGridRenderer(camera *twodee.Camera, sheet *twodee.Spritesheet) (renderer *GridRenderer, err error) {
+func NewGridRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GridRenderer, err error) {
 	var (
 		sprite *twodee.SpriteRenderer
 	)
-	if sprite, err = twodee.NewSpriteRenderer(camera); err != nil {
+	if sprite, err = twodee.NewSpriteRenderer(level.Camera); err != nil {
 		return
 	}
 	renderer = &GridRenderer{
@@ -43,7 +43,7 @@ func (r *GridRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (r *GridRenderer) Draw(level *Level, mousex float32, mousey float32) {
+func (r *GridRenderer) Draw(level *Level) {
 	var (
 		configs = []twodee.SpriteConfig{}
 		x       int32
@@ -71,7 +71,7 @@ func (r *GridRenderer) Draw(level *Level, mousex float32, mousey float32) {
 			mob,
 		))
 	}
-	configs = append(configs, r.cursorSpriteConfig(r.sheet, mgl32.Vec2{mousex, mousey}))
+	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse()))
 	r.sprite.Draw(configs)
 }
 
