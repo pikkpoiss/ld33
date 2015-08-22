@@ -46,7 +46,7 @@ func NewLevel() (level *Level, err error) {
 	grid = NewGrid()
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
-		twodee.Rect(0, 0, 1024, 640),
+		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 	); err != nil {
 		return
 	}

@@ -42,7 +42,8 @@ func NewApplication() (app *Application, err error) {
 		context          *twodee.Context
 		gamelayer        *GameLayer
 		menulayer        *MenuLayer
-		winbounds        = twodee.Rect(0, 0, 1024, 640)
+		hudlayer         *HudLayer
+		winbounds        = twodee.Rect(0, 0, ScreenWidth, ScreenHeight)
 		state            = NewState()
 		gameEventHandler = twodee.NewGameEventHandler(NumGameEventTypes)
 		audioSystem      *AudioSystem
@@ -75,6 +76,10 @@ func NewApplication() (app *Application, err error) {
 		return
 	}
 	layers.Push(menulayer)
+	if hudlayer, err = NewHudLayer(app); err != nil {
+		return
+	}
+	layers.Push(hudlayer)
 	if audioSystem, err = NewAudioSystem(app); err != nil {
 		return
 	}
