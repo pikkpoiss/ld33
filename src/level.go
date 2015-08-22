@@ -14,15 +14,29 @@
 
 package main
 
-import ()
+import (
+	"time"
+)
 
 type Level struct {
 	Grid *Grid
+	Mobs []*Mob
 }
 
 func NewLevel() (level *Level, err error) {
 	level = &Level{
 		Grid: NewGrid(),
+		Mobs: []*Mob{},
 	}
 	return
+}
+
+func (l *Level) Update(elapsed time.Duration) {
+	for _, mob := range l.Mobs {
+		mob.Update(elapsed, l)
+	}
+}
+
+func (l *Level) AddMob(x, y float32) {
+	l.Mobs = append(l.Mobs, &Mob{x, y})
 }

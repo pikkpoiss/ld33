@@ -14,25 +14,14 @@
 
 package main
 
-import ()
+import (
+	"time"
+)
 
-type GridItem struct {
-	passable bool
-	distance int32
+type Mob struct {
+	X float32
+	Y float32
 }
 
-func (i *GridItem) Passable() bool {
-	return i.passable
-}
-
-func (i *GridItem) Opaque() bool {
-	return i.passable
-}
-
-func (i *GridItem) SetDistance(dist int32) {
-	i.distance = dist
-}
-
-func (i *GridItem) Distance() int32 {
-	return i.distance
+func (m *Mob) Update(elapsed time.Duration, level *Level) {
 }

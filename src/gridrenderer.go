@@ -42,28 +42,49 @@ func (r *GridRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (r *GridRenderer) Draw(grid *Grid) {
+func (r *GridRenderer) Draw(level *Level) {
 	var (
 		configs = []twodee.SpriteConfig{}
 		x       int32
 		y       int32
 		item    *GridItem
 	)
-	for x = 0; x < grid.Width(); x++ {
-		for y = 0; y < grid.Height(); y++ {
-			item = grid.Get(x, y)
-			configs = append(configs, r.spriteConfig(
+	for x = 0; x < level.Grid.Width(); x++ {
+		for y = 0; y < level.Grid.Height(); y++ {
+			item = level.Grid.Get(x, y)
+			configs = append(configs, r.gridSpriteConfig(
 				r.sheet,
-				int(x),
-				int(y),
+				float32(x),
+				float32(y),
 				item,
 			))
 		}
 	}
+	for _, mob := range level.Mobs {
+		configs = append(configs, r.mobSpriteConfig(
+			r.sheet,
+			mob.X,
+			mob.Y,
+			mob,
+		))
+	}
 	r.sprite.Draw(configs)
 }
 
-func (r *GridRenderer) spriteConfig(sheet *twodee.Spritesheet, x, y int, item *GridItem) twodee.SpriteConfig {
+func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, x, y float32, mob *Mob) twodee.SpriteConfig {
+	var frame *twodee.SpritesheetFrame
+	frame = sheet.GetFrame("numbered_squares_00")
+	return twodee.SpriteConfig{
+		View: twodee.ModelViewConfig{
+			x, y, 0,
+			0, 0, 0,
+			1.0, 1.0, 1.0,
+		},
+		Frame: frame.Frame,
+	}
+}
+
+func (r *GridRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
 	if item.Distance() >= 0 && item.Distance() < 15 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
@@ -74,7 +95,7 @@ func (r *GridRenderer) spriteConfig(sheet *twodee.Spritesheet, x, y int, item *G
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			float32(x) + 0.5, float32(y) + 0.5, 0,
+			x + 0.5, y + 0.5, 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

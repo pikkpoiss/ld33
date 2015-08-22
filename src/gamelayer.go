@@ -25,6 +25,7 @@ const (
 )
 
 type GameLayer struct {
+	camera         *twodee.Camera
 	gridRenderer   *GridRenderer
 	spriteSheet    *twodee.Spritesheet
 	spriteTexture  *twodee.Texture
@@ -54,36 +55,38 @@ func (l *GameLayer) Delete() {
 
 func (l *GameLayer) Render() {
 	l.spriteTexture.Bind()
-	l.gridRenderer.Draw(l.level.Grid)
+	l.gridRenderer.Draw(l.level)
 	l.spriteTexture.Unbind()
 }
 
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	switch event := evt.(type) {
 	case *twodee.MouseMoveEvent:
-		l.mouseX, l.mouseY = event.X, event.Y
+		l.mouseX, l.mouseY = l.camera.ScreenToWorldCoords(event.X, event.Y)
+	case *twodee.MouseButtonEvent:
+		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
+			l.level.AddMob(l.mouseX, l.mouseY)
+		}
 	}
 	return true
 }
 
 func (l *GameLayer) Reset() (err error) {
-	var (
-		camera *twodee.Camera
-	)
-	camera, err = twodee.NewCamera(
+	l.camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(l.level.Grid.Width()), float32(l.level.Grid.Height())),
 		twodee.Rect(0, 0, 1024, 640),
 	)
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.gridRenderer, err = NewGridRenderer(camera, l.spriteSheet); err != nil {
+	if l.gridRenderer, err = NewGridRenderer(l.camera, l.spriteSheet); err != nil {
 		return
 	}
 	return
 }
 
 func (l *GameLayer) Update(elapsed time.Duration) {
+	l.level.Update(elapsed)
 }
 
 func (l *GameLayer) loadSpritesheet() (err error) {
