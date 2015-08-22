@@ -21,12 +21,12 @@ import (
 )
 
 type Level struct {
-	Camera *twodee.Camera
+	Camera         *twodee.Camera
 	Grid           *Grid
 	Mobs           []*Mob
 	ActiveMobCount int
-	MousePos mgl32.Vec2
-	cursor string
+	MousePos       mgl32.Vec2
+	cursor         string
 }
 
 const (
@@ -35,8 +35,8 @@ const (
 
 func NewLevel() (level *Level, err error) {
 	var (
-		mobs []*Mob
-		grid *Grid
+		mobs   []*Mob
+		grid   *Grid
 		camera *twodee.Camera
 	)
 	mobs = make([]*Mob, MaxMobs)
@@ -51,7 +51,7 @@ func NewLevel() (level *Level, err error) {
 		return
 	}
 	level = &Level{
-		Camera: camera,
+		Camera:         camera,
 		Grid:           grid,
 		Mobs:           mobs,
 		ActiveMobCount: 0,

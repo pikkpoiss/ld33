@@ -28,12 +28,13 @@ type GameLayer struct {
 	gameRenderer   *GameRenderer
 	spriteSheet    *twodee.Spritesheet
 	spriteTexture  *twodee.Texture
+	app            *Application
 	level          *Level
 	uiState        UiState
 	mouseX, mouseY float32
 }
 
-func NewGameLayer() (layer *GameLayer, err error) {
+func NewGameLayer(app *Application) (layer *GameLayer, err error) {
 	var (
 		level   *Level
 		uiState UiState
@@ -44,6 +45,7 @@ func NewGameLayer() (layer *GameLayer, err error) {
 	uiState = NewNormalUiState()
 	uiState.Register(level)
 	layer = &GameLayer{
+		app:     app,
 		level:   level,
 		uiState: uiState,
 	}
@@ -67,6 +69,21 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		l.uiState = newState
 		l.uiState.Register(l.level)
 	}
+
+	switch event := evt.(type) {
+	case *twodee.KeyEvent:
+		if event.Type == twodee.Release {
+			break
+		}
+		switch event.Code {
+		case twodee.KeyM:
+			if twodee.MusicIsPaused() {
+				l.app.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(ResumeMusic))
+			} else {
+				l.app.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PauseMusic))
+			}
+		}
+	}
 	return true
 }
 
@@ -77,6 +94,7 @@ func (l *GameLayer) Reset() (err error) {
 	if l.gameRenderer, err = NewGameRenderer(l.level, l.spriteSheet); err != nil {
 		return
 	}
+	l.app.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayBackgroundMusic))
 	return
 }
 
