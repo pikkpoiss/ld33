@@ -59,7 +59,7 @@ func (r *GridRenderer) spriteConfig(sheet *twodee.Spritesheet, x, y int) twodee.
 	frame := sheet.GetFrame("numbered_squares_00")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			float32(x), float32(y), 0,
+			float32(x) + 0.5, float32(y) + 0.5, 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
