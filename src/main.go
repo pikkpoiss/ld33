@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"runtime"
+	"time"
 )
 
 func init() {
@@ -27,14 +28,19 @@ func init() {
 }
 
 type Application struct {
+	layers  *twodee.Layers
 	Context *twodee.Context
+	State   *State
 }
 
 func NewApplication() (app *Application, err error) {
 	var (
 		name      = "Twodee sample project"
-		winbounds = twodee.Rect(0, 0, 1024, 640)
+		layers    *twodee.Layers
 		context   *twodee.Context
+		menulayer *MenuLayer
+		winbounds = twodee.Rect(0, 0, 1024, 640)
+		state     = NewState()
 	)
 	if context, err = twodee.NewContext(); err != nil {
 		return
@@ -48,9 +54,16 @@ func NewApplication() (app *Application, err error) {
 	); err != nil {
 		return
 	}
+	layers = twodee.NewLayers()
 	app = &Application{
+		layers:  layers,
 		Context: context,
+		State: state,
 	}
+	if menulayer, err = NewMenuLayer(winbounds, state, app); err != nil {
+		return
+	}
+	layers.Push(menulayer)
 	fmt.Printf("OpenGL version: %s\n", context.OpenGLVersion)
 	fmt.Printf("Shader version: %s\n", context.ShaderVersion)
 	return
@@ -58,9 +71,15 @@ func NewApplication() (app *Application, err error) {
 
 func (a *Application) Draw() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	a.layers.Render()
+}
+
+func (a *Application) Update(elapsed time.Duration) {
+	a.layers.Update(elapsed)
 }
 
 func (a *Application) Delete() {
+	a.layers.Delete()
 	a.Context.Delete()
 }
 
