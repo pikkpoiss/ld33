@@ -25,27 +25,24 @@ const (
 )
 
 type GameLayer struct {
-	grid          *twodee.Grid
 	gridRenderer  *GridRenderer
 	spriteSheet   *twodee.Spritesheet
 	spriteTexture *twodee.Texture
+	level         *Level
 }
 
 func NewGameLayer() (layer *GameLayer, err error) {
 	var (
 		gridRenderer *GridRenderer
-		grid         *twodee.Grid
+		level        *Level
 	)
-	grid = twodee.NewGrid(64, 40, PxPerUnit)
-	if err != nil {
+	if level, err = NewLevel(); err != nil {
 		return
 	}
 	layer = &GameLayer{
-		grid:         grid,
+		level:        level,
 		gridRenderer: gridRenderer,
 	}
-	grid.Set(4, 19, &GridItem{false})
-	grid.Set(60, 20, &GridItem{false})
 	err = layer.Reset()
 	return
 }
@@ -56,7 +53,7 @@ func (l *GameLayer) Delete() {
 
 func (l *GameLayer) Render() {
 	l.spriteTexture.Bind()
-	l.gridRenderer.Draw(l.grid)
+	l.gridRenderer.Draw(l.level.Grid)
 	l.spriteTexture.Unbind()
 }
 
@@ -69,7 +66,7 @@ func (l *GameLayer) Reset() (err error) {
 		camera *twodee.Camera
 	)
 	camera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, float32(l.grid.Width), float32(l.grid.Height)),
+		twodee.Rect(0, 0, float32(l.level.Grid.Width), float32(l.level.Grid.Height)),
 		twodee.Rect(0, 0, 1024, 640),
 	)
 	if err = l.loadSpritesheet(); err != nil {
