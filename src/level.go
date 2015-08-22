@@ -26,6 +26,7 @@ type Level struct {
 	Mobs           []*Mob
 	ActiveMobCount int
 	MousePos mgl32.Vec2
+	cursor string
 }
 
 const (
@@ -78,6 +79,14 @@ func (l *Level) SetMouse(screenX, screenY float32) {
 
 func (l *Level) GetMouse() mgl32.Vec2 {
 	return l.MousePos
+}
+
+func (l *Level) SetCursor(frame string) {
+	l.cursor = frame
+}
+
+func (l *Level) GetCursor() string {
+	return l.cursor
 }
 
 func (l *Level) AddMob(pos mgl32.Vec2) {

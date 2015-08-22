@@ -20,6 +20,7 @@ import (
 )
 
 type UiState interface {
+	Register(level *Level)
 	HandleEvent(level *Level, evt twodee.Event) UiState
 }
 
@@ -28,6 +29,10 @@ type NormalUiState struct {
 
 func NewNormalUiState() UiState {
 	return &NormalUiState{}
+}
+
+func (s *NormalUiState) Register(level *Level) {
+	level.SetCursor("numbered_squares_01")
 }
 
 func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
@@ -51,6 +56,10 @@ type BlockUiState struct {
 
 func NewBlockUiState() UiState {
 	return &BlockUiState{}
+}
+
+func (s *BlockUiState) Register(level *Level) {
+	level.SetCursor("numbered_squares_04")
 }
 
 func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {

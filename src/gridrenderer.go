@@ -71,12 +71,12 @@ func (r *GridRenderer) Draw(level *Level) {
 			mob,
 		))
 	}
-	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse()))
+	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
 	r.sprite.Draw(configs)
 }
 
-func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2) twodee.SpriteConfig {
-	frame := sheet.GetFrame("numbered_squares_08")
+func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
+	frame := sheet.GetFrame(cursor)
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			pt.X(), pt.Y(), 0,
@@ -85,7 +85,6 @@ func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 		},
 		Frame: frame.Frame,
 	}
-
 }
 
 func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {

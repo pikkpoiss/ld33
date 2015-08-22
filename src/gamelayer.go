@@ -35,14 +35,17 @@ type GameLayer struct {
 
 func NewGameLayer() (layer *GameLayer, err error) {
 	var (
-		level *Level
+		level   *Level
+		uiState UiState
 	)
 	if level, err = NewLevel(); err != nil {
 		return
 	}
+	uiState = NewNormalUiState()
+	uiState.Register(level)
 	layer = &GameLayer{
 		level:   level,
-		uiState: NewNormalUiState(),
+		uiState: uiState,
 	}
 	err = layer.Reset()
 	return
@@ -61,6 +64,7 @@ func (l *GameLayer) Render() {
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	if newState := l.uiState.HandleEvent(l.level, evt); newState != nil {
 		l.uiState = newState
+		l.uiState.Register(l.level)
 	}
 	return true
 }
