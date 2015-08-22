@@ -43,7 +43,7 @@ func (m *Mob) moveTowardExit(elapsed time.Duration, level *Level) {
 		return
 	}
 	gridDist = dest.Sub(m.Pos)
-	if goalDist == 0 && gridDist.Len() < stepDist+0.5 {
+	if goalDist == 1 && gridDist.Len() < stepDist + 0.5 {
 		m.PendingDisable = true
 	}
 	m.Pos = m.Pos.Add(gridDist.Normalize().Mul(stepDist))

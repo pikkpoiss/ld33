@@ -16,6 +16,7 @@ package main
 
 import (
 	"../lib/twodee"
+	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -48,7 +49,7 @@ func NewGrid() (g *Grid) {
 	g.SetEnter(Ivec2{4, 19})
 	g.SetExit(Ivec2{40, 20})
 	g.init()
-	g.setDistances()
+	g.CalculateDistances()
 	return
 }
 
@@ -74,6 +75,40 @@ func (g *Grid) Set(pt Ivec2, item *GridItem) {
 	g.grid.Set(pt.X(), pt.Y(), item)
 }
 
+func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
+	var (
+		pt   = origin.Plus(block.Offset)
+		item *GridItem
+	)
+	ok = true
+	for y := 0; y < len(block.Template); y++ {
+		for x := 0; x < len(block.Template[y]); x++ {
+			item = g.get(pt.Plus(Ivec2{int32(x), int32(y)}))
+			if item != nil && !item.Passable() {
+				fmt.Printf("Invalid! %v\n", item)
+				ok = false
+				break
+			}
+		}
+	}
+	return
+}
+
+func (g *Grid) SetBlock(origin Ivec2, block *Block) bool {
+	var (
+		pt = origin.Plus(block.Offset)
+	)
+	if !g.IsBlockValid(origin, block) {
+		return false
+	}
+	for y := 0; y < len(block.Template); y++ {
+		for x := 0; x < len(block.Template[y]); x++ {
+			g.Set(pt.Plus(Ivec2{int32(x), int32(y)}), block.Template[y][x])
+		}
+	}
+	return true
+}
+
 func (g *Grid) Width() int32 {
 	return g.grid.Width
 }
@@ -82,12 +117,16 @@ func (g *Grid) Height() int32 {
 	return g.grid.Height
 }
 
+func (g *Grid) WorldToGrid(worldCoords mgl32.Vec2) Ivec2 {
+	return Ivec2{
+		g.grid.GridPosition(worldCoords[0]),
+		g.grid.GridPosition(worldCoords[1]),
+	}
+}
+
 func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, valid bool) {
 	var (
-		gridPt = Ivec2{
-			g.grid.GridPosition(pt[0]),
-			g.grid.GridPosition(pt[1]),
-		}
+		gridPt = g.WorldToGrid(pt)
 		points []Ivec2
 		item   *GridItem
 	)
@@ -95,7 +134,7 @@ func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, val
 	points = g.getAdjacent(gridPt)
 	valid = false
 	for _, adj := range points {
-		if item = g.get(adj); item != nil {
+		if item = g.get(adj); item != nil && item.Passable() {
 			if item.Distance() < dist {
 				dist = item.Distance()
 				out = mgl32.Vec2{
@@ -120,18 +159,36 @@ func (g *Grid) init() {
 		for y = 0; y < g.Height(); y++ {
 			pt = Ivec2{x, y}
 			if item = g.get(pt); item == nil {
-				g.Set(pt, &GridItem{false, -1})
+				g.Set(pt, &GridItem{true, -1})
 			}
 		}
 	}
 }
 
-func (g *Grid) setDistances() {
+func (g *Grid) resetDistances() {
+	var (
+		x    int32
+		y    int32
+		item *GridItem
+		pt   Ivec2
+	)
+	for x = 0; x < g.Width(); x++ {
+		for y = 0; y < g.Height(); y++ {
+			pt = Ivec2{x, y}
+			if item = g.get(pt); item != nil && item.Passable() {
+				item.SetDistance(-1)
+			}
+		}
+	}
+}
+
+func (g *Grid) CalculateDistances() {
 	var (
 		queue       = []Ivec2{g.exit}
 		dist  int32 = 1
 		item  *GridItem
 	)
+	g.resetDistances()
 	for len(queue) > 0 {
 		pt := queue[0]
 		queue = queue[1:]
@@ -140,7 +197,7 @@ func (g *Grid) setDistances() {
 		dist = item.Distance() + 1
 		for _, adj := range points {
 			item = g.get(adj)
-			if item != nil && item.Distance() == -1 {
+			if item != nil && item.Distance() == -1 && item.Passable() {
 				queue = append(queue, adj)
 				item.SetDistance(dist)
 			}

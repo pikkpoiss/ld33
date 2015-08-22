@@ -89,6 +89,15 @@ func (l *Level) GetCursor() string {
 	return l.cursor
 }
 
+func (l *Level) SetBlock(pos mgl32.Vec2, block *Block) {
+	var (
+		gridCoords = l.Grid.WorldToGrid(pos)
+	)
+	if l.Grid.SetBlock(gridCoords, block) {
+		l.Grid.CalculateDistances()
+	}
+}
+
 func (l *Level) AddMob(pos mgl32.Vec2) {
 	if l.ActiveMobCount == MaxMobs {
 		// TODO: Do we need an error state?
