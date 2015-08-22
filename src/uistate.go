@@ -16,6 +16,7 @@ package main
 
 import (
 	"../lib/twodee"
+	"fmt"
 )
 
 type UiState interface {
@@ -36,6 +37,33 @@ func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			level.AddMob(level.GetMouse())
+		}
+	case *twodee.KeyEvent:
+		if event.Type == twodee.Press && event.Code == twodee.Key1 {
+			return NewBlockUiState()
+		}
+	}
+	return nil
+}
+
+type BlockUiState struct {
+}
+
+func NewBlockUiState() UiState {
+	return &BlockUiState{}
+}
+
+func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
+	switch event := evt.(type) {
+	case *twodee.MouseMoveEvent:
+		level.SetMouse(event.X, event.Y)
+	case *twodee.MouseButtonEvent:
+		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
+			fmt.Printf("Drop block %v\n", level.GetMouse())
+		}
+	case *twodee.KeyEvent:
+		if event.Type == twodee.Press && event.Code == twodee.Key0 {
+			return NewNormalUiState()
 		}
 	}
 	return nil
