@@ -88,7 +88,7 @@ func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 }
 
 func (r *GameRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {
-	frame := sheet.GetFrame("numbered_squares_00")
+	frame := sheet.GetFrame("special_squares_01")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			pt.X(), pt.Y(), 0,

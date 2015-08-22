@@ -155,7 +155,7 @@
 },
 {
 	"filename": "special_squares_01",
-	"frame": {"x":36,"y":2,"w":32,"h":32},
+	"frame": {"x":36,"y":172,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -295,6 +295,6 @@
 	"format": "RGBA8888",
 	"size": {"w":128,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:31455b4b62dfe0ba341438d2ebfa1e2e:075c06374721b34b5929615f7228becf:729adc6043343cfda41c447ce8f464d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:066c805564739229183cc13b4f8e5297:b229efb9f3a4d37e959d286211d90e7d:729adc6043343cfda41c447ce8f464d6$"
 }
 }

@@ -22,12 +22,33 @@ type Block struct {
 }
 
 var (
-	StandardBlock = Block{
+	OneBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
 				&GridItem{false, 0},
 			},
 		},
 		Ivec2{0, 0},
+	}
+
+	ThreeBlock = Block{
+		[][]*GridItem{
+			[]*GridItem{
+				&GridItem{false, 0},
+				&GridItem{false, 0},
+				&GridItem{false, 0},
+			},
+			[]*GridItem{
+				&GridItem{false, 0},
+				&GridItem{false, 0},
+				&GridItem{false, 0},
+			},
+			[]*GridItem{
+				&GridItem{false, 0},
+				&GridItem{false, 0},
+				&GridItem{false, 0},
+			},
+		},
+		Ivec2{-1, -1},
 	}
 )

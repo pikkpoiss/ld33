@@ -16,8 +16,8 @@ package main
 
 import (
 	"../lib/twodee"
-	"github.com/go-gl/mathgl/mgl32"
 	"fmt"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 type Ivec2 [2]int32
@@ -96,15 +96,14 @@ func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
 
 func (g *Grid) SetBlock(origin Ivec2, block *Block) bool {
 	var (
-		pt Ivec2
+		pt = origin.Plus(block.Offset)
 	)
 	if !g.IsBlockValid(origin, block) {
 		return false
 	}
 	for y := 0; y < len(block.Template); y++ {
 		for x := 0; x < len(block.Template[y]); x++ {
-			pt = origin.Plus(Ivec2{int32(x), int32(y)})
-			g.Set(pt, block.Template[y][x])
+			g.Set(pt.Plus(Ivec2{int32(x), int32(y)}), block.Template[y][x])
 		}
 	}
 	return true

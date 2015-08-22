@@ -16,8 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
-	"github.com/go-gl/mathgl/mgl32"
 )
 
 type UiState interface {
@@ -50,19 +48,21 @@ func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		}
 	case *twodee.KeyEvent:
 		if event.Type == twodee.Press && event.Code == twodee.Key1 {
-			return NewBlockUiState()
+			return NewBlockUiState(&OneBlock)
+		} else if event.Type == twodee.Press && event.Code == twodee.Key2 {
+			return NewBlockUiState(&ThreeBlock)
 		}
 	}
 	return nil
 }
 
 type BlockUiState struct {
-	Size mgl32.Vec2
+	target *Block
 }
 
-func NewBlockUiState() UiState {
+func NewBlockUiState(target *Block) UiState {
 	return &BlockUiState{
-		mgl32.Vec2{3, 3},
+		target,
 	}
 }
 
@@ -79,8 +79,7 @@ func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		level.SetMouse(event.X, event.Y)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
-			fmt.Printf("Drop block %v\n", level.GetMouse())
-			level.SetBlock(level.GetMouse(), &StandardBlock)
+			level.SetBlock(level.GetMouse(), s.target)
 		}
 	case *twodee.KeyEvent:
 		if event.Type == twodee.Press && event.Code == twodee.Key0 {
