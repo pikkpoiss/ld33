@@ -16,37 +16,77 @@ package main
 
 import (
 	"../lib/twodee"
+	"image/color"
 	"time"
 )
 
 type HudLayer struct {
 	camera       *twodee.Camera
-	cameraBounds twodee.Rectangle
+	textRenderer *twodee.TextRenderer
+	regfont      *twodee.FontFace
 	app          *Application
 }
 
 func NewHudLayer(app *Application) (layer *HudLayer, err error) {
 	var (
-		camera *twodee.Camera
+		textRenderer *twodee.TextRenderer
+		regfont      *twodee.FontFace
+		bg           = color.Transparent
+		font         = "resources/fonts/Prototype.ttf"
+		camera       *twodee.Camera
 	)
 	if camera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, float32(GridWidth), float32(GridHeight)),
+		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 	); err != nil {
 		return
 	}
+	if textRenderer, err = twodee.NewTextRenderer(camera); err != nil {
+		return
+	}
+	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{100, 100, 100, 255}, bg); err != nil {
+		return
+	}
 	layer = &HudLayer{
-		camera: camera,
-		app:    app,
+		camera:       camera,
+		textRenderer: textRenderer,
+		regfont:      regfont,
+		app:          app,
 	}
 	return
 }
 
 func (h *HudLayer) Delete() {
+	h.textRenderer.Delete()
 }
 
 func (h *HudLayer) Render() {
+	// Render text for 'Geld', <Geld Amount>, 'Rating', <Rating Amount>
+	hudItems := []string{"0", "YARPS", "0", "GELD"}
 
+	var (
+		textcache *twodee.TextCache
+		texture   *twodee.Texture
+		x = h.camera.WorldBounds.Max.X()
+		y = h.camera.WorldBounds.Max.Y()
+	)
+
+	h.textRenderer.Bind()
+	textcache = twodee.NewTextCache(h.regfont)
+
+	for i, elem := range hudItems {
+		textcache.SetText(elem)
+		texture = textcache.Texture
+		if texture != nil {
+			if i % 2 == 0 {
+				x = x - (float32(texture.Width) + 10)
+			} else {
+				x = x - float32(texture.Width)
+			}
+			h.textRenderer.Draw(texture, x, y - float32(texture.Height))
+		}
+	}
+	h.textRenderer.Unbind()
 }
 
 func (h *HudLayer) HandleEvent(evt twodee.Event) bool {
@@ -54,7 +94,12 @@ func (h *HudLayer) HandleEvent(evt twodee.Event) bool {
 }
 
 func (h *HudLayer) Reset() (err error) {
-	h.Delete()
+	if h.textRenderer != nil {
+		h.textRenderer.Delete()
+	}
+	if h.textRenderer, err = twodee.NewTextRenderer(h.camera); err != nil {
+		return
+	}
 	return
 }
 
