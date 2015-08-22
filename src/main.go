@@ -38,8 +38,8 @@ func NewApplication() (app *Application, err error) {
 		name      = "LD33"
 		layers    *twodee.Layers
 		context   *twodee.Context
-		menulayer *MenuLayer
 		gamelayer *GameLayer
+		menulayer *MenuLayer
 		winbounds = twodee.Rect(0, 0, 1024, 640)
 		state     = NewState()
 	)
@@ -59,7 +59,7 @@ func NewApplication() (app *Application, err error) {
 	app = &Application{
 		layers:  layers,
 		Context: context,
-		State: state,
+		State:   state,
 	}
 	if gamelayer, err = NewGameLayer(); err != nil {
 		return
@@ -88,6 +88,26 @@ func (a *Application) Delete() {
 	a.Context.Delete()
 }
 
+func (a *Application) ProcessEvents() {
+	var (
+		evt   twodee.Event
+		loop  = true
+		count = 0
+	)
+	for loop {
+		select {
+		case evt = <-a.Context.Events.Events:
+			a.layers.HandleEvent(evt)
+			count++
+			if count > 10 {
+				loop = false
+			}
+		default:
+			loop = false
+		}
+	}
+}
+
 func main() {
 	var (
 		app *Application
@@ -99,8 +119,19 @@ func main() {
 	}
 	defer app.Delete()
 
-	for !app.Context.ShouldClose() {
+	var (
+		current_time = time.Now()
+		updated_to   = current_time
+		step         = twodee.Step60Hz
+	)
+	for !app.Context.ShouldClose() && !app.State.Exit {
 		app.Context.Events.Poll()
+		app.ProcessEvents()
+		for !updated_to.After(current_time) {
+			app.Update(step)
+			updated_to = updated_to.Add(step)
+		}
+		current_time = current_time.Add(step)
 		app.Draw()
 		app.Context.SwapBuffers()
 	}
