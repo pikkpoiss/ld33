@@ -20,8 +20,10 @@ import (
 )
 
 type Mob struct {
-	Pos   mgl32.Vec2
-	Speed float32
+	Pos            mgl32.Vec2
+	Speed          float32
+	Enabled        bool
+	PendingDisable bool
 }
 
 func (m *Mob) Update(elapsed time.Duration, level *Level) {
@@ -30,12 +32,31 @@ func (m *Mob) Update(elapsed time.Duration, level *Level) {
 
 func (m *Mob) moveTowardExit(elapsed time.Duration, level *Level) {
 	var (
-		dest mgl32.Vec2
-		ok   bool
-		pct  = float32(elapsed) / float32(time.Second)
+		dest     mgl32.Vec2
+		ok       bool
+		pct      = float32(elapsed) / float32(time.Second)
+		gridDist mgl32.Vec2
+		goalDist int32
+		stepDist = pct * m.Speed
 	)
-	if dest, ok = level.Grid.GetNextStepToExit(m.Pos); !ok {
+	if dest, goalDist, ok = level.Grid.GetNextStepToExit(m.Pos); !ok {
 		return
 	}
-	m.Pos = m.Pos.Add(dest.Sub(m.Pos).Normalize().Mul(pct * m.Speed))
+	gridDist = dest.Sub(m.Pos)
+	if goalDist == 0 && gridDist.Len() < stepDist + 0.5 {
+		m.PendingDisable = true
+	}
+	m.Pos = m.Pos.Add(gridDist.Normalize().Mul(stepDist))
+}
+
+func (m *Mob) Activate(pos mgl32.Vec2, speed float32) {
+	m.Enabled = true
+	m.PendingDisable = false
+	m.Pos = pos
+	m.Speed = speed
+}
+
+func (m *Mob) Disable() {
+	m.Enabled = false
+	m.PendingDisable = false
 }

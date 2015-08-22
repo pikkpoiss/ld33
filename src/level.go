@@ -20,24 +20,52 @@ import (
 )
 
 type Level struct {
-	Grid *Grid
-	Mobs []*Mob
+	Grid           *Grid
+	Mobs           []*Mob
+	ActiveMobCount int
 }
 
+const (
+	MaxMobs = 200
+)
+
 func NewLevel() (level *Level, err error) {
+	mobs := make([]*Mob, MaxMobs)
+	for i := 0; i < MaxMobs; i++ {
+		mobs[i] = &Mob{}
+	}
 	level = &Level{
-		Grid: NewGrid(),
-		Mobs: []*Mob{},
+		Grid:           NewGrid(),
+		Mobs:           mobs,
+		ActiveMobCount: 0,
 	}
 	return
 }
 
 func (l *Level) Update(elapsed time.Duration) {
-	for _, mob := range l.Mobs {
-		mob.Update(elapsed, l)
+	for i, mob := range l.Mobs {
+		if !mob.Enabled { // No enabled mobs after first disabled mob.
+			break
+		}
+		if mob.PendingDisable {
+			l.disableMob(i)
+		} else {
+			mob.Update(elapsed, l)
+		}
 	}
 }
 
 func (l *Level) AddMob(pos mgl32.Vec2) {
-	l.Mobs = append(l.Mobs, &Mob{pos, 2.0})
+	if l.ActiveMobCount == MaxMobs {
+		// TODO: Do we need an error state?
+		return
+	}
+	l.Mobs[l.ActiveMobCount].Activate(pos, 2.0)
+	l.ActiveMobCount++
+}
+
+func (l *Level) disableMob(i int) {
+	l.ActiveMobCount--
+	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
+	l.Mobs[l.ActiveMobCount].Disable()
 }

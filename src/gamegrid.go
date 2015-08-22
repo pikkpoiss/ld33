@@ -82,7 +82,7 @@ func (g *Grid) Height() int32 {
 	return g.grid.Height
 }
 
-func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, valid bool) {
+func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, valid bool) {
 	var (
 		gridPt = Ivec2{
 			g.grid.GridPosition(pt[0]),
@@ -90,8 +90,8 @@ func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, valid bool) {
 		}
 		points []Ivec2
 		item   *GridItem
-		dist   int32 = 999999
 	)
+	dist = 9999999
 	points = g.getAdjacent(gridPt)
 	valid = false
 	for _, adj := range points {

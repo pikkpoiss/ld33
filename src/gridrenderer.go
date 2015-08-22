@@ -62,6 +62,9 @@ func (r *GridRenderer) Draw(level *Level, mousex float32, mousey float32) {
 		}
 	}
 	for _, mob := range level.Mobs {
+		if !mob.Enabled { // No enabled mobs after first disabled mob.
+			break
+		}
 		configs = append(configs, r.mobSpriteConfig(
 			r.sheet,
 			mob.Pos,
