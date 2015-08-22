@@ -14,15 +14,41 @@
 
 package main
 
-import ()
+import (
+	"../lib/twodee"
+)
 
-type Level struct {
-	Grid *Grid
+type Grid struct {
+	grid        *twodee.Grid
+	defaultItem *GridItem
 }
 
-func NewLevel() (level *Level, err error) {
-	level = &Level{
-		Grid: NewGrid(),
+func NewGrid() (g *Grid) {
+	g = &Grid{
+		grid:        twodee.NewGrid(64, 40, PxPerUnit),
+		defaultItem: &GridItem{true},
 	}
+	g.grid.Set(4, 19, &GridItem{false})
+	g.grid.Set(60, 20, &GridItem{false})
 	return
+}
+
+func (g *Grid) Get(x, y int32) (item *GridItem) {
+	var (
+		tditem twodee.GridItem
+		ok     bool
+	)
+	tditem = g.grid.Get(x, y)
+	if item, ok = tditem.(*GridItem); !ok {
+		return g.defaultItem
+	}
+	return item
+}
+
+func (g *Grid) Width() int32 {
+	return g.grid.Width
+}
+
+func (g *Grid) Height() int32 {
+	return g.grid.Height
 }

@@ -66,7 +66,7 @@ func (l *GameLayer) Reset() (err error) {
 		camera *twodee.Camera
 	)
 	camera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, float32(l.level.Grid.Width), float32(l.level.Grid.Height)),
+		twodee.Rect(0, 0, float32(l.level.Grid.Width()), float32(l.level.Grid.Height())),
 		twodee.Rect(0, 0, 1024, 640),
 	)
 	if err = l.loadSpritesheet(); err != nil {

@@ -41,21 +41,16 @@ func (r *GridRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (r *GridRenderer) Draw(grid *twodee.Grid) {
+func (r *GridRenderer) Draw(grid *Grid) {
 	var (
 		configs = []twodee.SpriteConfig{}
 		x       int32
 		y       int32
-		tditem  twodee.GridItem
 		item    *GridItem
-		ok      bool
 	)
-	for x = 0; x < grid.Width; x++ {
-		for y = 0; y < grid.Height; y++ {
-			tditem = grid.Get(x, y)
-			if item, ok = tditem.(*GridItem); !ok {
-				item = nil
-			}
+	for x = 0; x < grid.Width(); x++ {
+		for y = 0; y < grid.Height(); y++ {
+			item = grid.Get(x, y)
 			configs = append(configs, r.spriteConfig(
 				r.sheet,
 				int(x),
