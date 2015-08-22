@@ -80,6 +80,7 @@ func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			fmt.Printf("Drop block %v\n", level.GetMouse())
+			level.SetBlock(level.GetMouse(), &StandardBlock)
 		}
 	case *twodee.KeyEvent:
 		if event.Type == twodee.Press && event.Code == twodee.Key0 {

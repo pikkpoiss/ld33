@@ -101,10 +101,10 @@ func (r *GameRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2,
 
 func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
-	if item.Distance() >= 0 && item.Distance() < 15 {
+	if !item.Passable() {
+		frame = sheet.GetFrame("special_squares_00")
+	} else if item.Distance() >= 0 && item.Distance() < 15 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
-	} else if item.Passable() {
-		frame = sheet.GetFrame("numbered_squares_00")
 	} else {
 		frame = sheet.GetFrame("numbered_squares_14")
 	}
