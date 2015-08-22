@@ -14,10 +14,12 @@
 
 package main
 
-import ()
+import (
+)
 
 type GridItem struct {
 	passable bool
+	distance int32
 }
 
 func (i *GridItem) Passable() bool {
@@ -26,4 +28,12 @@ func (i *GridItem) Passable() bool {
 
 func (i *GridItem) Opaque() bool {
 	return i.passable
+}
+
+func (i *GridItem) SetDistance(dist int32) {
+	i.distance = dist
+}
+
+func (i *GridItem) Distance() int32 {
+	return i.distance
 }
