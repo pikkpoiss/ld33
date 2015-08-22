@@ -39,6 +39,7 @@ func NewApplication() (app *Application, err error) {
 		layers    *twodee.Layers
 		context   *twodee.Context
 		menulayer *MenuLayer
+		gamelayer *GameLayer
 		winbounds = twodee.Rect(0, 0, 1024, 640)
 		state     = NewState()
 	)
@@ -60,6 +61,10 @@ func NewApplication() (app *Application, err error) {
 		Context: context,
 		State: state,
 	}
+	if gamelayer, err = NewGameLayer(); err != nil {
+		return
+	}
+	layers.Push(gamelayer)
 	if menulayer, err = NewMenuLayer(winbounds, state, app); err != nil {
 		return
 	}

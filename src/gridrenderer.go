@@ -19,25 +19,18 @@ import (
 )
 
 type GridRenderer struct {
-	grid   *twodee.Grid
 	sheet  *twodee.Spritesheet
 	sprite *twodee.SpriteRenderer
 }
 
-func NewGridRenderer(grid *twodee.Grid, sheet *twodee.Spritesheet) (renderer *GridRenderer, err error) {
+func NewGridRenderer(camera *twodee.Camera, sheet *twodee.Spritesheet) (renderer *GridRenderer, err error) {
 	var (
-		camera *twodee.Camera
 		sprite *twodee.SpriteRenderer
-	)
-	camera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, float32(grid.Width), float32(grid.Height)),
-		twodee.Rect(0, 0, 640, 480),
 	)
 	if sprite, err = twodee.NewSpriteRenderer(camera); err != nil {
 		return
 	}
 	renderer = &GridRenderer{
-		grid:   grid,
 		sprite: sprite,
 		sheet:  sheet,
 	}
@@ -48,14 +41,14 @@ func (r *GridRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (r *GridRenderer) Draw() {
+func (r *GridRenderer) Draw(grid *twodee.Grid) {
 	var (
 		configs = []twodee.SpriteConfig{}
 		x       int32
 		y       int32
 	)
-	for x = 0; x < r.grid.Width; x++ {
-		for y = 0; y < r.grid.Height; y++ {
+	for x = 0; x < grid.Width; x++ {
+		for y = 0; y < grid.Height; y++ {
 			configs = append(configs, r.spriteConfig(r.sheet, int(x), int(y)))
 		}
 	}
