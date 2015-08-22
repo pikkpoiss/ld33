@@ -1,0 +1,6 @@
+export TDP_VERSION=1.0.0
+export TDP_PROJECT=ld33
+
+export TDP_DESC="Ludum Dare 33 by Pikkpoiss. You are the Monster. Version 9.9.9."
+export TDP_NAME="LD33"
+export TDP_IDNT="us.regio.eg"
