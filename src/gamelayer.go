@@ -25,13 +25,12 @@ const (
 )
 
 type GameLayer struct {
-	gameRenderer   *GameRenderer
-	spriteSheet    *twodee.Spritesheet
-	spriteTexture  *twodee.Texture
-	app            *Application
-	level          *Level
-	uiState        UiState
-	mouseX, mouseY float32
+	gameRenderer  *GameRenderer
+	spriteSheet   *twodee.Spritesheet
+	spriteTexture *twodee.Texture
+	app           *Application
+	level         *Level
+	uiState       UiState
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
