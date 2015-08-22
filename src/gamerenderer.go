@@ -65,11 +65,7 @@ func (r *GameRenderer) Draw(level *Level) {
 		if !mob.Enabled { // No enabled mobs after first disabled mob.
 			break
 		}
-		configs = append(configs, r.mobSpriteConfig(
-			r.sheet,
-			mob.Pos,
-			mob,
-		))
+		configs = append(configs, mob.SpriteConfig(r.sheet))
 	}
 	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
 	r.sprite.Draw(configs)
@@ -77,18 +73,6 @@ func (r *GameRenderer) Draw(level *Level) {
 
 func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
 	frame := sheet.GetFrame(cursor)
-	return twodee.SpriteConfig{
-		View: twodee.ModelViewConfig{
-			pt.X(), pt.Y(), 0,
-			0, 0, 0,
-			1.0, 1.0, 1.0,
-		},
-		Frame: frame.Frame,
-	}
-}
-
-func (r *GameRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {
-	frame := sheet.GetFrame("special_squares_01")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			pt.X(), pt.Y(), 0,
