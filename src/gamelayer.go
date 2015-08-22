@@ -16,6 +16,7 @@ package main
 
 import (
 	"../lib/twodee"
+	"github.com/go-gl/mathgl/mgl32"
 	"io/ioutil"
 	"time"
 )
@@ -65,7 +66,7 @@ func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 		l.mouseX, l.mouseY = l.camera.ScreenToWorldCoords(event.X, event.Y)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
-			l.level.AddMob(l.mouseX, l.mouseY)
+			l.level.AddMob(mgl32.Vec2{l.mouseX, l.mouseY})
 		}
 	}
 	return true

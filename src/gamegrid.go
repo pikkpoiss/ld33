@@ -16,6 +16,7 @@ package main
 
 import (
 	"../lib/twodee"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 type Ivec2 [2]int32
@@ -41,32 +42,36 @@ type Grid struct {
 
 func NewGrid() (g *Grid) {
 	g = &Grid{
-		grid:        twodee.NewGrid(64, 40, PxPerUnit),
+		grid:        twodee.NewGrid(64, 40, 1.0),
 		defaultItem: &GridItem{true, 0},
 	}
-	g.SetEnter(4, 19)
-	g.SetExit(60, 20)
+	g.SetEnter(Ivec2{4, 19})
+	g.SetExit(Ivec2{40, 20})
 	g.init()
 	g.setDistances()
 	return
 }
 
-func (g *Grid) SetEnter(x, y int32) {
-	g.grid.Set(x, y, &GridItem{false, 0})
-	g.enter = Ivec2{x, y}
+func (g *Grid) SetEnter(pt Ivec2) {
+	g.Set(pt, &GridItem{false, 0})
+	g.enter = pt
 }
 
-func (g *Grid) SetExit(x, y int32) {
-	g.grid.Set(x, y, &GridItem{false, 0})
-	g.exit = Ivec2{x, y}
+func (g *Grid) SetExit(pt Ivec2) {
+	g.Set(pt, &GridItem{false, 0})
+	g.exit = pt
 }
 
-func (g *Grid) Get(x, y int32) (item *GridItem) {
-	item = g.get(Ivec2{x, y})
+func (g *Grid) Get(pt Ivec2) (item *GridItem) {
+	item = g.get(pt)
 	if item == nil {
 		return g.defaultItem
 	}
 	return item
+}
+
+func (g *Grid) Set(pt Ivec2, item *GridItem) {
+	g.grid.Set(pt.X(), pt.Y(), item)
 }
 
 func (g *Grid) Width() int32 {
@@ -77,17 +82,45 @@ func (g *Grid) Height() int32 {
 	return g.grid.Height
 }
 
+func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, valid bool) {
+	var (
+		gridPt = Ivec2{
+			g.grid.GridPosition(pt[0]),
+			g.grid.GridPosition(pt[1]),
+		}
+		points []Ivec2
+		item   *GridItem
+		dist   int32 = 999999
+	)
+	points = g.getAdjacent(gridPt)
+	valid = false
+	for _, adj := range points {
+		if item = g.get(adj); item != nil {
+			if item.Distance() < dist {
+				dist = item.Distance()
+				out = mgl32.Vec2{
+					g.grid.InversePosition(adj.X()),
+					g.grid.InversePosition(adj.Y()),
+				}
+				valid = true
+			}
+		}
+	}
+	return
+}
+
 func (g *Grid) init() {
 	var (
 		x    int32
 		y    int32
 		item *GridItem
+		pt   Ivec2
 	)
 	for x = 0; x < g.Width(); x++ {
 		for y = 0; y < g.Height(); y++ {
-			item = g.get(Ivec2{x, y})
-			if item == nil {
-				g.grid.Set(x, y, &GridItem{false, -1})
+			pt = Ivec2{x, y}
+			if item = g.get(pt); item == nil {
+				g.Set(pt, &GridItem{false, -1})
 			}
 		}
 	}

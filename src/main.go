@@ -55,6 +55,7 @@ func NewApplication() (app *Application, err error) {
 	); err != nil {
 		return
 	}
+	context.SetSwapInterval(2)
 	layers = twodee.NewLayers()
 	app = &Application{
 		layers:  layers,

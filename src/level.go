@@ -15,6 +15,7 @@
 package main
 
 import (
+	"github.com/go-gl/mathgl/mgl32"
 	"time"
 )
 
@@ -37,6 +38,6 @@ func (l *Level) Update(elapsed time.Duration) {
 	}
 }
 
-func (l *Level) AddMob(x, y float32) {
-	l.Mobs = append(l.Mobs, &Mob{x, y})
+func (l *Level) AddMob(pos mgl32.Vec2) {
+	l.Mobs = append(l.Mobs, &Mob{pos, 2.0})
 }

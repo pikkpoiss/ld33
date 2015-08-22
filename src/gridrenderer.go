@@ -17,6 +17,7 @@ package main
 import (
 	"../lib/twodee"
 	"fmt"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 type GridRenderer struct {
@@ -51,7 +52,7 @@ func (r *GridRenderer) Draw(level *Level, mousex float32, mousey float32) {
 	)
 	for x = 0; x < level.Grid.Width(); x++ {
 		for y = 0; y < level.Grid.Height(); y++ {
-			item = level.Grid.Get(x, y)
+			item = level.Grid.Get(Ivec2{x, y})
 			configs = append(configs, r.gridSpriteConfig(
 				r.sheet,
 				float32(x),
@@ -63,20 +64,19 @@ func (r *GridRenderer) Draw(level *Level, mousex float32, mousey float32) {
 	for _, mob := range level.Mobs {
 		configs = append(configs, r.mobSpriteConfig(
 			r.sheet,
-			mob.X,
-			mob.Y,
+			mob.Pos,
 			mob,
 		))
 	}
-	configs = append(configs, r.cursorSpriteConfig(r.sheet, mousex, mousey))
+	configs = append(configs, r.cursorSpriteConfig(r.sheet, mgl32.Vec2{mousex, mousey}))
 	r.sprite.Draw(configs)
 }
 
-func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, x, y float32) twodee.SpriteConfig {
+func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2) twodee.SpriteConfig {
 	frame := sheet.GetFrame("numbered_squares_08")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x, y, 0,
+			pt.X(), pt.Y(), 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
@@ -85,11 +85,11 @@ func (r *GridRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, x, y float3
 
 }
 
-func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, x, y float32, mob *Mob) twodee.SpriteConfig {
+func (r *GridRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {
 	frame := sheet.GetFrame("numbered_squares_00")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x, y, 0,
+			pt.X(), pt.Y(), 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

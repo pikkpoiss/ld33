@@ -15,13 +15,27 @@
 package main
 
 import (
+	"github.com/go-gl/mathgl/mgl32"
 	"time"
 )
 
 type Mob struct {
-	X float32
-	Y float32
+	Pos   mgl32.Vec2
+	Speed float32
 }
 
 func (m *Mob) Update(elapsed time.Duration, level *Level) {
+	m.moveTowardExit(elapsed, level)
+}
+
+func (m *Mob) moveTowardExit(elapsed time.Duration, level *Level) {
+	var (
+		dest mgl32.Vec2
+		ok   bool
+		pct  = float32(elapsed) / float32(time.Second)
+	)
+	if dest, ok = level.Grid.GetNextStepToExit(m.Pos); !ok {
+		return
+	}
+	m.Pos = m.Pos.Add(dest.Sub(m.Pos).Normalize().Mul(pct * m.Speed))
 }
