@@ -29,7 +29,10 @@ func NewGridRenderer(grid *twodee.Grid, sheet *twodee.Spritesheet) (renderer *Gr
 		camera *twodee.Camera
 		sprite *twodee.SpriteRenderer
 	)
-	camera, err = twodee.NewCamera(twodee.Rect(0, 0, 50, 50), twodee.Rect(0, 0, 640, 480))
+	camera, err = twodee.NewCamera(
+		twodee.Rect(0, 0, float32(grid.Width), float32(grid.Height)),
+		twodee.Rect(0, 0, 640, 480),
+	)
 	if sprite, err = twodee.NewSpriteRenderer(camera); err != nil {
 		return
 	}
@@ -45,11 +48,25 @@ func (r *GridRenderer) Delete() {
 	r.sprite.Delete()
 }
 
-func (b *GridRenderer) spriteConfig(sheet *twodee.Spritesheet) twodee.SpriteConfig {
+func (r *GridRenderer) Draw() {
+	var (
+		configs = []twodee.SpriteConfig{}
+		x       int32
+		y       int32
+	)
+	for x = 0; x < r.grid.Width; x++ {
+		for y = 0; y < r.grid.Height; y++ {
+			configs = append(configs, r.spriteConfig(r.sheet, int(x), int(y)))
+		}
+	}
+	r.sprite.Draw(configs)
+}
+
+func (r *GridRenderer) spriteConfig(sheet *twodee.Spritesheet, x, y int) twodee.SpriteConfig {
 	frame := sheet.GetFrame("numbered_squares_00")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			1.0, 2.0, 0,
+			float32(x), float32(y), 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
