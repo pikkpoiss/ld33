@@ -18,16 +18,18 @@ import (
 	"../lib/twodee"
 	"image/color"
 	"time"
+	"strconv"
 )
 
 type HudLayer struct {
 	camera       *twodee.Camera
 	textRenderer *twodee.TextRenderer
 	regfont      *twodee.FontFace
+	state        *State
 	app          *Application
 }
 
-func NewHudLayer(app *Application) (layer *HudLayer, err error) {
+func NewHudLayer(state *State, app *Application) (layer *HudLayer, err error) {
 	var (
 		textRenderer *twodee.TextRenderer
 		regfont      *twodee.FontFace
@@ -51,6 +53,7 @@ func NewHudLayer(app *Application) (layer *HudLayer, err error) {
 		camera:       camera,
 		textRenderer: textRenderer,
 		regfont:      regfont,
+		state:        state,
 		app:          app,
 	}
 	return
@@ -62,13 +65,13 @@ func (h *HudLayer) Delete() {
 
 func (h *HudLayer) Render() {
 	// Render text for 'Geld', <Geld Amount>, 'Rating', <Rating Amount>
-	hudItems := []string{"0", "YARPS", "0", "GELD"}
+	hudItems := []string{strconv.Itoa(h.state.Rating), "YARPS", strconv.Itoa(h.state.Geld), "GELD"}
 
 	var (
 		textcache *twodee.TextCache
 		texture   *twodee.Texture
-		x = h.camera.WorldBounds.Max.X()
-		y = h.camera.WorldBounds.Max.Y()
+		x         = h.camera.WorldBounds.Max.X()
+		y         = h.camera.WorldBounds.Max.Y()
 	)
 
 	h.textRenderer.Bind()
@@ -78,12 +81,12 @@ func (h *HudLayer) Render() {
 		textcache.SetText(elem)
 		texture = textcache.Texture
 		if texture != nil {
-			if i % 2 == 0 {
+			if i%2 == 0 {
 				x = x - (float32(texture.Width) + 10)
 			} else {
 				x = x - float32(texture.Width)
 			}
-			h.textRenderer.Draw(texture, x, y - float32(texture.Height))
+			h.textRenderer.Draw(texture, x, y-float32(texture.Height))
 		}
 	}
 	h.textRenderer.Unbind()
