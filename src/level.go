@@ -43,7 +43,9 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	for i := 0; i < MaxMobs; i++ {
 		mobs[i] = NewMob(sheet)
 	}
-	grid = NewGrid()
+	if grid, err = NewGrid(); err != nil {
+		return
+	}
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),

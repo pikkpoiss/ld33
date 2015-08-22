@@ -4,17 +4,19 @@ GITROOT=`git rev-parse --show-toplevel`
 
 cd $GITROOT
 
-mkdir -p tmp
-
 build_aesprite() {
+  DEST=${2:-tmp}
+  mkdir -p ${DEST}
   aseprite \
     --batch assets/${1}.ase \
-    --save-as tmp/${1}_00.png
+    --save-as ${DEST}/${1}_00.png
 }
 
 build_aesprite numbered_squares
 build_aesprite special_squares
 build_aesprite human01
+build_aesprite tiles
+build_aesprite tiles "assets/tiled"
 cp assets/*.png tmp/
 
 TexturePacker \

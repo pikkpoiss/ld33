@@ -41,10 +41,16 @@ type Grid struct {
 	exit        Ivec2
 }
 
-func NewGrid() (g *Grid) {
+func NewGrid() (g *Grid, err error) {
+	var (
+		grid *twodee.Grid
+	)
+	if grid, err = LoadTiledMap("resources/maps/map01.tmx"); err != nil {
+		return
+	}
 	g = &Grid{
-		grid:        twodee.NewGrid(GridWidth, GridHeight, 1.0),
-		defaultItem: &GridItem{true, 0},
+		grid:        grid,
+		defaultItem: &GridItem{true, 0, "tiles_00"},
 	}
 	g.SetEnter(Ivec2{4, 9})
 	g.SetExit(Ivec2{20, 10})
@@ -54,12 +60,12 @@ func NewGrid() (g *Grid) {
 }
 
 func (g *Grid) SetEnter(pt Ivec2) {
-	g.Set(pt, &GridItem{false, 0})
+	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
 	g.enter = pt
 }
 
 func (g *Grid) SetExit(pt Ivec2) {
-	g.Set(pt, &GridItem{false, 0})
+	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
 	g.exit = pt
 }
 
@@ -149,6 +155,7 @@ func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, val
 }
 
 func (g *Grid) init() {
+	/*
 	var (
 		x    int32
 		y    int32
@@ -163,6 +170,7 @@ func (g *Grid) init() {
 			}
 		}
 	}
+	*/
 }
 
 func (g *Grid) resetDistances() {
