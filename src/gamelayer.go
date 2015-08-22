@@ -20,10 +20,6 @@ import (
 	"time"
 )
 
-const (
-	PxPerUnit = 32
-)
-
 type GameLayer struct {
 	gameRenderer  *GameRenderer
 	spriteSheet   *twodee.Spritesheet

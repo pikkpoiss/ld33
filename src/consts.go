@@ -17,6 +17,7 @@ package main
 const (
 	ScreenWidth  float32 = 1024
 	ScreenHeight float32 = 640
-	GridWidth    int32   = 64
-	GridHeight   int32   = 40
+	GridWidth    int32   = 32
+	GridHeight   int32   = 20
+	PxPerUnit    float32 = 16
 )

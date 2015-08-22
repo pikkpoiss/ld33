@@ -21,26 +21,31 @@ import (
 )
 
 type GameRenderer struct {
-	sheet  *twodee.Spritesheet
-	sprite *twodee.SpriteRenderer
+	sheet   *twodee.Spritesheet
+	sprite  *twodee.SpriteRenderer
+	effects *EffectsRenderer
 }
 
 func NewGameRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GameRenderer, err error) {
 	var (
-		sprite *twodee.SpriteRenderer
+		xsize = int(PxPerUnit) * int(GridWidth)
+		ysize = int(PxPerUnit) * int(GridHeight)
 	)
-	if sprite, err = twodee.NewSpriteRenderer(level.Camera); err != nil {
+	renderer = &GameRenderer{
+		sheet: sheet,
+	}
+	if renderer.sprite, err = twodee.NewSpriteRenderer(level.Camera); err != nil {
 		return
 	}
-	renderer = &GameRenderer{
-		sprite: sprite,
-		sheet:  sheet,
+	if renderer.effects, err = NewEffectsRenderer(xsize, ysize); err != nil {
+		return
 	}
 	return
 }
 
 func (r *GameRenderer) Delete() {
 	r.sprite.Delete()
+	r.effects.Delete()
 }
 
 func (r *GameRenderer) Draw(level *Level) {
@@ -68,7 +73,10 @@ func (r *GameRenderer) Draw(level *Level) {
 		configs = append(configs, mob.SpriteConfig(r.sheet))
 	}
 	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
+	r.effects.Bind()
 	r.sprite.Draw(configs)
+	r.effects.Unbind()
+	r.effects.Draw()
 }
 
 func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
@@ -94,7 +102,7 @@ func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32,
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x + 0.5, y + 0.5, 0,
+			x + frame.Width / 2.0, y + frame.Height / 2.0, 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

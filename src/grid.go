@@ -46,8 +46,8 @@ func NewGrid() (g *Grid) {
 		grid:        twodee.NewGrid(GridWidth, GridHeight, 1.0),
 		defaultItem: &GridItem{true, 0},
 	}
-	g.SetEnter(Ivec2{4, 19})
-	g.SetExit(Ivec2{40, 20})
+	g.SetEnter(Ivec2{4, 9})
+	g.SetExit(Ivec2{20, 10})
 	g.init()
 	g.CalculateDistances()
 	return
