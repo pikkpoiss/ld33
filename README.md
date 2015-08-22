@@ -2,6 +2,29 @@
 
 "You are the Monster"
 
+## Task List
+
+- [x] Render a basic grid level
+- [x] Render player cursor
+- [] Ability to pick & place blocks
+- [] Enum for block types
+- [] Icons for different blocks
+- [] Blocks should have "stats"
+- [] Ability to pick up (delete?) blocks?
+- [] Track placed blocks in level
+- [] Ring effect around block showing radius of effect (also placement grid and another color for things which would be deleted?)
+- [x] Mobs spawning and despawning
+- [] Mob "spawner". Perhaps several entrances?
+- [x] Mobs path to despawn
+- [] Mobs yield gold upon despawn
+- [] "Star rating" review system
+- [] Mobs must be scared within "an inch of their life"
+
+### Stretch?
+- [] Mobs avoid congested zones
+- [] Mobs can die?
+- [] Differing mob phenotypes?
+
 ## Ideas
 
  - General
