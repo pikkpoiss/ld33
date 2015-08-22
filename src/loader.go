@@ -40,9 +40,6 @@ func LoadTiledMap(path string) (grid *twodee.Grid, err error) {
 		return
 	}
 	grid = twodee.NewGrid(m.Width, m.Height, 1.0)
-	for _, tile = range tiles {
-		fmt.Printf("tile %v\n", tile)
-	}
 	for x = 0; x < grid.Width; x++ {
 		for y = 0; y < grid.Height; y++ {
 			tile = tiles[y*grid.Width+x]
