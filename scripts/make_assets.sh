@@ -14,6 +14,7 @@ build_aesprite() {
 
 build_aesprite numbered_squares
 build_aesprite special_squares
+build_aesprite human01
 cp assets/*.png tmp/
 
 TexturePacker \

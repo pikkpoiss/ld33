@@ -33,7 +33,7 @@ const (
 	MaxMobs = 200
 )
 
-func NewLevel() (level *Level, err error) {
+func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
 		mobs   []*Mob
 		grid   *Grid
@@ -41,7 +41,7 @@ func NewLevel() (level *Level, err error) {
 	)
 	mobs = make([]*Mob, MaxMobs)
 	for i := 0; i < MaxMobs; i++ {
-		mobs[i] = &Mob{}
+		mobs[i] = NewMob(sheet)
 	}
 	grid = NewGrid()
 	if camera, err = twodee.NewCamera(
