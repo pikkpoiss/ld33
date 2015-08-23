@@ -35,12 +35,16 @@ func (s BaseUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		if event.Type == twodee.Press {
 			switch event.Code {
 			case twodee.Key1:
-				if OneBlock.Cost <= level.State.Geld {
-					return NewBlockUiState(&OneBlock)
+				if SkellyBlock.Cost <= level.State.Geld {
+					return NewBlockUiState(&SkellyBlock)
 				}
 			case twodee.Key2:
-				if ThreeBlock.Cost <= level.State.Geld {
-					return NewBlockUiState(&ThreeBlock)
+				if SpikesBlock.Cost <= level.State.Geld {
+					return NewBlockUiState(&SpikesBlock)
+				}
+			case twodee.Key3:
+				if CornerBlock.Cost <= level.State.Geld {
+					return NewBlockUiState(&CornerBlock)
 				}
 			case twodee.Key0:
 				return NewNormalUiState()
@@ -93,6 +97,7 @@ func NewBlockUiState(target *Block) UiState {
 
 func (s *BlockUiState) Register(level *Level) {
 	level.SetCursor("mouse_01")
+	level.SetHighlights(level.GetMouse(), s.target, s.variant)
 }
 
 func (s *BlockUiState) Unregister(level *Level) {

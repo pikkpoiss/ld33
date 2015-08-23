@@ -85,7 +85,6 @@ func (h *HudLayer) Render() {
 		yText           = h.textCamera.WorldBounds.Max.Y()
 		ySprite         = h.spriteCamera.WorldBounds.Max.Y()
 		verticalSpacing = 80
-		blockNum        float32
 	)
 
 	h.textRenderer.Bind()
@@ -113,21 +112,15 @@ func (h *HudLayer) Render() {
 	}
 
 	// Render text for each of the available blocks to purchase
+	blocks := []*Block{&SkellyBlock, &SpikesBlock, &CornerBlock}
 	blockCost := 0
-	for i := 1; i < 3; i++ {
-		switch i {
-		case 1:
-			blockCost = OneBlock.Cost
-		case 2:
-			blockCost = ThreeBlock.Cost
-		default:
-			blockCost = 0
-		}
+	for i, block := range blocks {
+		blockCost = block.Cost
 		if blockCost <= h.state.Geld {
-			textcache.SetText(strconv.Itoa(i))
+			textcache.SetText(strconv.Itoa(i + 1))
 			texture = textcache.Texture
 			if texture != nil {
-				h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*i))
+				h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*(i+1)))
 			}
 		}
 	}
@@ -136,17 +129,10 @@ func (h *HudLayer) Render() {
 
 	// Render toolbar for selecting blocks to place
 	h.spriteTexture.Bind()
-	for blockNum = 0; blockNum < 2; blockNum++ {
-		switch blockNum {
-		case 0:
-			blockCost = OneBlock.Cost
-		case 1:
-			blockCost = ThreeBlock.Cost
-		default:
-			blockCost = 0
-		}
+	for blockNum, block := range blocks {
+		blockCost = block.Cost
 		if blockCost <= h.state.Geld {
-			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, blockNum, ySprite))
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, float32(blockNum), ySprite))
 		} else {
 			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, ySprite))
 		}

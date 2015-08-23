@@ -75,7 +75,7 @@ type Block struct {
 }
 
 var (
-	OneBlock = Block{
+	SkellyBlock = Block{
 		Variants: []BlockTemplate{
 			BlockTemplate{
 				[]*GridItemTemplate{
@@ -90,7 +90,7 @@ var (
 		Cost:       10,
 	}
 
-	ThreeBlock = Block{
+	SpikesBlock = Block{
 		Variants: []BlockTemplate{
 			BlockTemplate{
 				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
@@ -100,6 +100,36 @@ var (
 			BlockTemplate{
 				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
 				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+			},
+		},
+		Offset:     Ivec2{-1, -1},
+		Range:      5.0,
+		MaxTargets: 3,
+		FearPerSec: 0.5,
+		Cost:       100,
+	}
+
+	CornerBlock = Block{
+		Variants: []BlockTemplate{
+			BlockTemplate{
+				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
+				[]*GridItemTemplate{nil, nil, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+			},
+			BlockTemplate{
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+				[]*GridItemTemplate{nil, nil, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
+			},
+			BlockTemplate{
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, nil, nil},
+				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
+			},
+			BlockTemplate{
+				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, nil, nil},
 				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
 			},
 		},
