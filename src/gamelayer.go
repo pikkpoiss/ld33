@@ -49,11 +49,15 @@ func (l *GameLayer) Render() {
 	l.spriteTexture.Unbind()
 }
 
+func (l *GameLayer) SetUiState(state UiState) {
+	l.uiState.Unregister(l.level)
+	l.uiState = state
+	l.uiState.Register(l.level)
+}
+
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	if newState := l.uiState.HandleEvent(l.level, evt); newState != nil {
-		l.uiState.Unregister(l.level)
-		l.uiState = newState
-		l.uiState.Register(l.level)
+		l.SetUiState(newState)
 	}
 
 	switch event := evt.(type) {

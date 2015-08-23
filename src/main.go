@@ -33,6 +33,7 @@ type Application struct {
 	State            *State
 	GameEventHandler *twodee.GameEventHandler
 	AudioSystem      *AudioSystem
+	gameLayer        *GameLayer
 }
 
 func NewApplication() (app *Application, err error) {
@@ -40,7 +41,6 @@ func NewApplication() (app *Application, err error) {
 		name             = "LD33"
 		layers           *twodee.Layers
 		context          *twodee.Context
-		gamelayer        *GameLayer
 		menulayer        *MenuLayer
 		hudlayer         *HudLayer
 		winbounds        = twodee.Rect(0, 0, ScreenWidth, ScreenHeight)
@@ -68,15 +68,15 @@ func NewApplication() (app *Application, err error) {
 		State:            state,
 		GameEventHandler: gameEventHandler,
 	}
-	if gamelayer, err = NewGameLayer(state, app); err != nil {
+	if app.gameLayer, err = NewGameLayer(state, app); err != nil {
 		return
 	}
-	layers.Push(gamelayer)
+	layers.Push(app.gameLayer)
 	if menulayer, err = NewMenuLayer(winbounds, state, app); err != nil {
 		return
 	}
 	layers.Push(menulayer)
-	if hudlayer, err = NewHudLayer(state, gamelayer.level.Grid, app); err != nil {
+	if hudlayer, err = NewHudLayer(state, app.gameLayer.level.Grid, app); err != nil {
 		return
 	}
 	layers.Push(hudlayer)
@@ -102,6 +102,10 @@ func (a *Application) Delete() {
 	a.layers.Delete()
 	a.Context.Delete()
 	a.AudioSystem.Delete()
+}
+
+func (a *Application) SetUiState(state UiState) {
+	a.gameLayer.SetUiState(state)
 }
 
 func (a *Application) ProcessEvents() {
