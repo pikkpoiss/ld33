@@ -102,7 +102,7 @@ func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32,
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x + frame.Width / 2.0, y + frame.Height / 2.0, 0,
+			x + frame.Width/2.0, y + frame.Height/2.0, 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

@@ -15,9 +15,9 @@
 package main
 
 type State struct {
-	Exit  bool
-	Geld int
-  Rating int
+	Exit   bool
+	Geld   int
+	Rating int
 }
 
 func NewState() *State {

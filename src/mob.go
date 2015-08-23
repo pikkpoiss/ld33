@@ -111,7 +111,7 @@ func (m *Mob) SpriteConfig(sheet *twodee.Spritesheet) twodee.SpriteConfig {
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			m.Pos.X(), m.Pos.Y() + frame.Height / 4.0, 0,
+			m.Pos.X(), m.Pos.Y() + frame.Height/4.0, 0,
 			0, 0, 0,
 			scaleX, 1.0, 1.0,
 		},
