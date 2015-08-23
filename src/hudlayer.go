@@ -84,7 +84,7 @@ func (h *HudLayer) Render() {
 		xText           = h.textCamera.WorldBounds.Max.X()
 		yText           = h.textCamera.WorldBounds.Max.Y()
 		ySprite         = h.spriteCamera.WorldBounds.Max.Y()
-		verticalSpacing = 90
+		verticalSpacing = 80
 		blockNum        float32
 	)
 
@@ -203,11 +203,11 @@ func (h *HudLayer) loadSpritesheet() (err error) {
 }
 
 func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32, y float32) twodee.SpriteConfig {
-	var toolbarSpriteSpacing float32 = 0.8
-	var toolbarSpriteVerticalOffset float32 = 2.4
+	var toolbarSpriteSpacing float32 = 1.4
+	var toolbarSpriteVerticalOffset float32 = 2.2
 	var frame *twodee.SpritesheetFrame
 	frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", block))
-	xPosition := (frame.Width / 2.0) + 1
+	xPosition := (frame.Width / 2.0) + 1.2
 	yPosition := y - (block * (frame.Height + toolbarSpriteSpacing)) - toolbarSpriteVerticalOffset
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
