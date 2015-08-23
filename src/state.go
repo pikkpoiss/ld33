@@ -18,12 +18,14 @@ type State struct {
 	Exit   bool
 	Geld   int
 	Rating int
+	Debug  bool
 }
 
 func NewState() *State {
 	return &State{
 		Exit:   false,
-		Geld:   0,
+		Geld:   100,
 		Rating: 5,
+		Debug:  false,
 	}
 }

@@ -84,7 +84,7 @@ func (h *HudLayer) Render() {
 		xText           = h.textCamera.WorldBounds.Max.X()
 		yText           = h.textCamera.WorldBounds.Max.Y()
 		ySprite         = h.spriteCamera.WorldBounds.Max.Y()
-		verticalSpacing = 90
+		verticalSpacing = 80
 		blockNum        float32
 	)
 
@@ -113,11 +113,22 @@ func (h *HudLayer) Render() {
 	}
 
 	// Render text for each of the available blocks to purchase
-	for i := 1; i < 4; i++ {
-		textcache.SetText(strconv.Itoa(i))
-		texture = textcache.Texture
-		if texture != nil {
-			h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*i))
+	blockCost := 0
+	for i := 1; i < 3; i++ {
+		switch i {
+		case 1:
+			blockCost = OneBlock.Cost
+		case 2:
+			blockCost = ThreeBlock.Cost
+		default:
+			blockCost = 0
+		}
+		if blockCost <= h.state.Geld {
+			textcache.SetText(strconv.Itoa(i))
+			texture = textcache.Texture
+			if texture != nil {
+				h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*i))
+			}
 		}
 	}
 
@@ -125,8 +136,20 @@ func (h *HudLayer) Render() {
 
 	// Render toolbar for selecting blocks to place
 	h.spriteTexture.Bind()
-	for blockNum = 0; blockNum < 3; blockNum++ {
-		configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, blockNum, ySprite))
+	for blockNum = 0; blockNum < 2; blockNum++ {
+		switch blockNum {
+		case 0:
+			blockCost = OneBlock.Cost
+		case 1:
+			blockCost = ThreeBlock.Cost
+		default:
+			blockCost = 0
+		}
+		if blockCost <= h.state.Geld {
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, blockNum, ySprite))
+		} else {
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, ySprite))
+		}
 	}
 	h.spriteRenderer.Draw(configs)
 	h.spriteTexture.Unbind()
@@ -180,11 +203,11 @@ func (h *HudLayer) loadSpritesheet() (err error) {
 }
 
 func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32, y float32) twodee.SpriteConfig {
-	var toolbarSpriteSpacing float32 = 0.8
-	var toolbarSpriteVerticalOffset float32 = 2.4
+	var toolbarSpriteSpacing float32 = 1.4
+	var toolbarSpriteVerticalOffset float32 = 2.2
 	var frame *twodee.SpritesheetFrame
 	frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", block))
-	xPosition := (frame.Width / 2.0) + 1
+	xPosition := (frame.Width / 2.0) + 1.2
 	yPosition := y - (block * (frame.Height + toolbarSpriteSpacing)) - toolbarSpriteVerticalOffset
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
