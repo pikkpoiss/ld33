@@ -362,7 +362,7 @@ func (l *Level) despawnMob(i int) {
 	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
 	l.State.Rating = l.calculateRating()
-	l.AddGeld(int(math.Floor(fear*10.0 + 0.5)))
+	l.AddGeld(int(math.Floor(fear + 0.5)))
 	l.disableMob(i)
 }
 
