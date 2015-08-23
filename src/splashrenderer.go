@@ -49,11 +49,11 @@ func (r *SplashRenderer) Draw(state *State) {
 	)
 	switch state.SplashState {
 	case SplashStart:
-		frame = "start.fw"
+		frame = "start"
 	case SplashWin:
-		frame = "win.fw"
+		frame = "win"
 	case SplashLose:
-		frame = "lose.fw"
+		frame = "lose"
 	}
 	if frame != "" {
 		configs = []twodee.SpriteConfig{
