@@ -77,14 +77,14 @@ func NewApplication() (app *Application, err error) {
 		return
 	}
 	layers.Push(splashlayer)
-	if hudlayer, err = NewHudLayer(state, app.gameLayer.level.Grid, app); err != nil {
-		return
-	}
-	layers.Push(hudlayer)
 	if menulayer, err = NewMenuLayer(winbounds, state, app); err != nil {
 		return
 	}
 	layers.Push(menulayer)
+	if hudlayer, err = NewHudLayer(state, app.gameLayer.level.Grid, app); err != nil {
+		return
+	}
+	layers.Push(hudlayer)
 	if audioSystem, err = NewAudioSystem(app); err != nil {
 		return
 	}
