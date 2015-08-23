@@ -46,23 +46,32 @@ func (s *SpawnZone) Spawn() bool {
 	return remainingCharge > 0
 }
 
+type Highlight struct {
+	Pos   Ivec2
+	Frame string
+}
+
 type Level struct {
 	Camera         *twodee.Camera
 	Grid           *Grid
+	State          *State
 	Mobs           []Mob
 	ActiveMobCount int
 	MousePos       mgl32.Vec2
+	Highlights     []Highlight
 	cursor         string
 	entries        []SpawnZone
 	exit           SpawnZone
 	blocks         map[Ivec2]*Block
+	fearHistory    []int
+	fearIndex      int
 }
 
 const (
 	MaxMobs = 200
 )
 
-func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
+func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
 		mobs    = make([]Mob, MaxMobs)
 		grid    *Grid
@@ -72,7 +81,8 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 			NewSpawnZone(Ivec2{4, 14}),
 			NewSpawnZone(Ivec2{4, 4}),
 		}
-		exit = NewSpawnZone(Ivec2{20, 10})
+		exit        = NewSpawnZone(Ivec2{20, 10})
+		fearHistory = make([]int, 100)
 	)
 	if grid, err = NewGrid(); err != nil {
 		return
@@ -93,14 +103,21 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 		return
 	}
 
+	for i := 0; i < 100; i++ {
+		fearHistory[i] = 5
+	}
+
 	level = &Level{
 		Camera:         camera,
 		Grid:           grid,
+		State:          state,
 		Mobs:           mobs,
 		ActiveMobCount: 0,
 		entries:        entries,
 		exit:           exit,
 		blocks:         make(map[Ivec2]*Block),
+		fearHistory:    fearHistory,
+		fearIndex:      0,
 	}
 	return
 }
@@ -121,7 +138,7 @@ func (l *Level) updateMobs(elapsed time.Duration) {
 
 func (l *Level) updateSpawns(elapsed time.Duration) {
 	// TODO: Calculate amount of charge as f(elapsed, rating)
-	charge := 0.01
+	charge := 0.002 * float64(l.State.Rating)
 	for i := range l.entries {
 		entry := &l.entries[i]
 		entry.AddCharge(charge)
@@ -182,6 +199,39 @@ func (l *Level) SetBlock(pos mgl32.Vec2, block *Block) {
 	}
 }
 
+func (l *Level) calculateRating() (newRating int) {
+	newRating = 0
+	for i := 0; i < 100; i++ {
+		newRating = newRating + l.fearHistory[i]
+	}
+	newRating = newRating / 100
+	return
+}
+
+func (l *Level) ClearHighlights() {
+	l.Highlights = l.Highlights[0:0]
+}
+
+func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block) {
+	var (
+		pre   = l.Grid.WorldToGrid(pos)
+		post  = pre.Plus(block.Offset)
+		frame = "special_squares_02"
+	)
+	l.ClearHighlights()
+	if !l.Grid.IsBlockValid(pre, block) {
+		frame = "special_squares_03"
+	}
+	for y := 0; y < len(block.Template); y++ {
+		for x := 0; x < len(block.Template[y]); x++ {
+			l.Highlights = append(l.Highlights, Highlight{
+				post.Plus(Ivec2{int32(x), int32(y)}),
+				frame,
+			})
+		}
+	}
+}
+
 func (l *Level) SpawnMob(v Ivec2) {
 	p := mgl32.Vec2{float32(v.X()), float32(v.Y())}
 	l.AddMob(p)
@@ -197,6 +247,14 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 }
 
 func (l *Level) disableMob(i int) {
+	l.fearHistory[l.fearIndex] = l.Mobs[i].Fear
+	if l.fearIndex == 99 {
+		l.fearIndex = 0
+	} else {
+		l.fearIndex++
+	}
+	l.State.Rating = l.calculateRating()
+	l.State.Geld = l.State.Geld + (l.Mobs[i].Fear * 10)
 	l.ActiveMobCount--
 	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
 	l.Mobs[l.ActiveMobCount].Disable()

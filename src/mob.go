@@ -39,6 +39,8 @@ type Mob struct {
 	*twodee.AnimatingEntity
 	State          MobState
 	Speed          float32
+	Fear           int
+	Alive          bool
 	Enabled        bool
 	PendingDisable bool
 	Pos            mgl32.Vec2
@@ -56,6 +58,8 @@ func NewMob(sheet *twodee.Spritesheet) *Mob {
 			twodee.Step10Hz,
 			MobAnimations[Walking|Right],
 		),
+		Fear:  1,
+		Alive: true,
 	}
 }
 
@@ -137,5 +141,12 @@ func (m *Mob) setState(state MobState) {
 		if frames, ok := MobAnimations[m.State]; ok {
 			m.SetFrames(frames)
 		}
+	}
+}
+
+func (m *Mob) increaseFear(fear int) {
+	m.Fear = m.Fear + fear
+	if m.Fear > 10 {
+		m.Alive = false
 	}
 }

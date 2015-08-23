@@ -16,7 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -81,7 +80,6 @@ func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
 		for x := 0; x < len(block.Template[y]); x++ {
 			item = g.Get(pt.Plus(Ivec2{int32(x), int32(y)}))
 			if item != nil && !item.Passable() {
-				fmt.Printf("Invalid! %v\n", item)
 				ok = false
 				break
 			}
