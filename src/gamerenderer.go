@@ -64,13 +64,14 @@ func (r *GameRenderer) Delete() {
 
 func (r *GameRenderer) Draw(level *Level) {
 	var (
-		count   = level.Grid.Width() * level.Grid.Height()
-		configs = make([]twodee.SpriteConfig, 0, count)
-		bgs     = make([]twodee.SpriteConfig, 0, count)
-		x       int32
-		y       int32
-		item    *GridItem
-		pt      Ivec2
+		count      = level.Grid.Width() * level.Grid.Height()
+		configs    = make([]twodee.SpriteConfig, 0, count)
+		bgs        = make([]twodee.SpriteConfig, 0, count)
+		highlights = make([]twodee.SpriteConfig, 0, len(level.Highlights))
+		x          int32
+		y          int32
+		item       *GridItem
+		pt         Ivec2
 	)
 	for x = 0; x < level.Grid.Width(); x++ {
 		for y = 0; y < level.Grid.Height(); y++ {
@@ -100,13 +101,31 @@ func (r *GameRenderer) Draw(level *Level) {
 		}
 		configs = append(configs, mob.SpriteConfig(r.sheet))
 	}
+	for _, highlight := range level.Highlights {
+		highlights = append(highlights, r.highlightSpriteConfig(r.sheet, highlight.Pos, highlight.Frame))
+	}
 	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
 	sort.Sort(ByY(configs))
 	r.effects.Bind()
 	r.sprite.Draw(bgs)
+	if len(highlights) > 0 {
+		r.sprite.Draw(highlights)
+	}
 	r.sprite.Draw(configs)
 	r.effects.Unbind()
 	r.effects.Draw()
+}
+
+func (r *GameRenderer) highlightSpriteConfig(sheet *twodee.Spritesheet, pt Ivec2, name string) twodee.SpriteConfig {
+	frame := sheet.GetFrame(name)
+	return twodee.SpriteConfig{
+		View: twodee.ModelViewConfig{
+			float32(pt.X()) + frame.Width/2.0, float32(pt.Y()) + frame.Height/2.0, 0.0,
+			0, 0, 0,
+			1.0, 1.0, 1.0,
+		},
+		Frame: frame.Frame,
+	}
 }
 
 func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
