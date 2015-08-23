@@ -90,6 +90,7 @@ func (s *BlockUiState) Register(level *Level) {
 }
 
 func (s *BlockUiState) Unregister(level *Level) {
+	level.ClearHighlights()
 }
 
 func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
@@ -97,6 +98,8 @@ func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		return state
 	}
 	switch event := evt.(type) {
+	case *twodee.MouseMoveEvent:
+		level.SetHighlights(level.GetMouse(), s.target)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			level.SetBlock(level.GetMouse(), s.target)

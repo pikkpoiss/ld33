@@ -46,6 +46,11 @@ func (s *SpawnZone) Spawn() bool {
 	return remainingCharge > 0
 }
 
+type Highlight struct {
+	Pos   Ivec2
+	Frame string
+}
+
 type Level struct {
 	Camera         *twodee.Camera
 	Grid           *Grid
@@ -53,6 +58,7 @@ type Level struct {
 	Mobs           []Mob
 	ActiveMobCount int
 	MousePos       mgl32.Vec2
+	Highlights     []Highlight
 	cursor         string
 	entries        []SpawnZone
 	exit           SpawnZone
@@ -183,6 +189,30 @@ func (l *Level) calculateRating() (newRating int) {
 	}
 	newRating = newRating / 100
 	return
+}
+
+func (l *Level) ClearHighlights() {
+	l.Highlights = l.Highlights[0:0]
+}
+
+func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block) {
+	var (
+		pre   = l.Grid.WorldToGrid(pos)
+		post  = pre.Plus(block.Offset)
+		frame = "special_squares_02"
+	)
+	l.ClearHighlights()
+	if !l.Grid.IsBlockValid(pre, block) {
+		frame = "special_squares_03"
+	}
+	for y := 0; y < len(block.Template); y++ {
+		for x := 0; x < len(block.Template[y]); x++ {
+			l.Highlights = append(l.Highlights, Highlight{
+				post.Plus(Ivec2{int32(x), int32(y)}),
+				frame,
+			})
+		}
+	}
 }
 
 func (l *Level) SpawnMob(v Ivec2) {
