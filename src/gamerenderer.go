@@ -32,9 +32,12 @@ func (a ByY) Less(i, j int) bool {
 }
 
 type GameRenderer struct {
-	sheet   *twodee.Spritesheet
-	sprite  *twodee.SpriteRenderer
-	effects *EffectsRenderer
+	sheet            *twodee.Spritesheet
+	sprite           *twodee.SpriteRenderer
+	effects          *EffectsRenderer
+	spritesDynamic   []twodee.SpriteConfig
+	spritesStatic    []twodee.SpriteConfig
+	spritesHighlight []twodee.SpriteConfig
 }
 
 func NewGameRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GameRenderer, err error) {
@@ -61,20 +64,19 @@ func (r *GameRenderer) Delete() {
 
 func (r *GameRenderer) Draw(level *Level) {
 	var (
-		count      = level.Grid.Width() * level.Grid.Height()
-		configs    = make([]twodee.SpriteConfig, 0, count)
-		bgs        = make([]twodee.SpriteConfig, 0, count)
-		highlights = make([]twodee.SpriteConfig, 0, len(level.Highlights))
-		x          int32
-		y          int32
-		item       *GridItem
-		pt         Ivec2
+		x    int32
+		y    int32
+		item *GridItem
+		pt   Ivec2
 	)
+	r.spritesStatic = r.spritesStatic[0:0]
+	r.spritesHighlight = r.spritesHighlight[0:0]
+	r.spritesDynamic = r.spritesDynamic[0:0]
 	for x = 0; x < level.Grid.Width(); x++ {
 		for y = 0; y < level.Grid.Height(); y++ {
 			pt = Ivec2{x, y}
 			item = level.Grid.GetBg(pt)
-			bgs = append(bgs, r.gridSpriteConfig(
+			r.spritesStatic = append(r.spritesStatic, r.gridSpriteConfig(
 				r.sheet,
 				float32(x),
 				float32(y),
@@ -84,7 +86,7 @@ func (r *GameRenderer) Draw(level *Level) {
 			if item == nil {
 				continue
 			}
-			configs = append(configs, r.gridSpriteConfig(
+			r.spritesDynamic = append(r.spritesDynamic, r.gridSpriteConfig(
 				r.sheet,
 				float32(x),
 				float32(y),
@@ -96,19 +98,25 @@ func (r *GameRenderer) Draw(level *Level) {
 		if !mob.Enabled { // No enabled mobs after first disabled mob.
 			break
 		}
-		configs = append(configs, mob.SpriteConfig(r.sheet))
+		r.spritesDynamic = append(r.spritesDynamic, mob.SpriteConfig(r.sheet))
 	}
 	for _, highlight := range level.Highlights {
-		highlights = append(highlights, r.highlightSpriteConfig(r.sheet, highlight.Pos, highlight.Frame))
+		r.spritesHighlight = append(
+			r.spritesHighlight,
+			r.highlightSpriteConfig(r.sheet, highlight.Pos, highlight.Frame),
+		)
 	}
-	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
-	sort.Sort(ByY(configs))
+	r.spritesDynamic = append(
+		r.spritesDynamic,
+		r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()),
+	)
+	sort.Sort(ByY(r.spritesDynamic))
 	r.effects.Bind()
-	r.sprite.Draw(bgs)
-	if len(highlights) > 0 {
-		r.sprite.Draw(highlights)
+	r.sprite.Draw(r.spritesStatic)
+	if len(r.spritesHighlight) > 0 {
+		r.sprite.Draw(r.spritesHighlight)
 	}
-	r.sprite.Draw(configs)
+	r.sprite.Draw(r.spritesDynamic)
 	r.effects.Unbind()
 	r.effects.Draw()
 }
