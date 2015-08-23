@@ -24,7 +24,30 @@ type UiState interface {
 	HandleEvent(level *Level, evt twodee.Event) UiState
 }
 
+type BaseUiState struct {
+}
+
+func (s BaseUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
+	switch event := evt.(type) {
+	case *twodee.MouseMoveEvent:
+		level.SetMouse(event.X, event.Y)
+	case *twodee.KeyEvent:
+		if event.Type == twodee.Press {
+			switch event.Code {
+			case twodee.Key1:
+				return NewBlockUiState(&OneBlock)
+			case twodee.Key2:
+				return NewBlockUiState(&ThreeBlock)
+			case twodee.Key0:
+				return NewNormalUiState()
+			}
+		}
+	}
+	return nil
+}
+
 type NormalUiState struct {
+	BaseUiState
 }
 
 func NewNormalUiState() UiState {
@@ -39,30 +62,26 @@ func (s *NormalUiState) Unregister(level *Level) {
 }
 
 func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
+	if state := s.BaseUiState.HandleEvent(level, evt); state != nil {
+		return state
+	}
 	switch event := evt.(type) {
-	case *twodee.MouseMoveEvent:
-		level.SetMouse(event.X, event.Y)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			level.AddMob(level.GetMouse())
-		}
-	case *twodee.KeyEvent:
-		if event.Type == twodee.Press && event.Code == twodee.Key1 {
-			return NewBlockUiState(&OneBlock)
-		} else if event.Type == twodee.Press && event.Code == twodee.Key2 {
-			return NewBlockUiState(&ThreeBlock)
 		}
 	}
 	return nil
 }
 
 type BlockUiState struct {
+	BaseUiState
 	target *Block
 }
 
 func NewBlockUiState(target *Block) UiState {
 	return &BlockUiState{
-		target,
+		target: target,
 	}
 }
 
@@ -74,16 +93,13 @@ func (s *BlockUiState) Unregister(level *Level) {
 }
 
 func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
+	if state := s.BaseUiState.HandleEvent(level, evt); state != nil {
+		return state
+	}
 	switch event := evt.(type) {
-	case *twodee.MouseMoveEvent:
-		level.SetMouse(event.X, event.Y)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			level.SetBlock(level.GetMouse(), s.target)
-		}
-	case *twodee.KeyEvent:
-		if event.Type == twodee.Press && event.Code == twodee.Key0 {
-			return NewNormalUiState()
 		}
 	}
 	return nil
