@@ -25,13 +25,10 @@ type ByY []twodee.SpriteConfig
 func (a ByY) Len() int      { return len(a) }
 func (a ByY) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a ByY) Less(i, j int) bool {
-	if a[i].View.Z == a[j].View.Z {
-		if int(a[i].View.Y) == int(a[j].View.Y) {
-			return a[i].View.X < a[j].View.X
-		}
-		return a[i].View.Y > a[j].View.Y
+	if a[i].View.Y == a[j].View.Y {
+		return a[i].View.X < a[j].View.X
 	}
-	return a[i].View.Z < a[j].View.Z
+	return a[i].View.Y > a[j].View.Y
 }
 
 type GameRenderer struct {
