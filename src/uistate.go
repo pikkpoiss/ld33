@@ -68,7 +68,9 @@ func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 	switch event := evt.(type) {
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
-			level.AddMob(level.GetMouse())
+			if level.State.Debug {
+				level.AddMob(level.GetMouse())
+			}
 		}
 	}
 	return nil
