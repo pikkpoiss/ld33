@@ -151,6 +151,7 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, block := range l.blocks {
 		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
+		fear := block.FearPerNS * int(elapsed)
 		numHit := 0
 		for i := range l.Mobs {
 			if numHit >= block.MaxTargets {
@@ -159,7 +160,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 			mob := &l.Mobs[i]
 			if mob.Pos.Sub(posV).Len() <= block.Range {
 				numHit++
-				// TODO affect mob sanity.
+				mob.IncreaseFear(fear)
 			}
 		}
 	}

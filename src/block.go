@@ -21,6 +21,7 @@ type Block struct {
 	Offset     Ivec2
 	Range      float32 // Radius of effectiveness.
 	MaxTargets int     // -1 for infinite.
+	FearPerNS  int     // Amount of fear added to target per nanosecond.
 	Cost       int
 }
 
@@ -34,6 +35,7 @@ var (
 		Ivec2{0, 0},
 		1.5,
 		1,
+		0,
 		10,
 	}
 
@@ -58,6 +60,7 @@ var (
 		Ivec2{-1, -1},
 		5.0,
 		3,
+		0,
 		100,
 	}
 )
