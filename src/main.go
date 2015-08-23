@@ -138,7 +138,7 @@ func main() {
 	var (
 		current_time = time.Now()
 		updated_to   = current_time
-		step         = twodee.Step60Hz
+		step         = twodee.Step30Hz
 	)
 	for !app.Context.ShouldClose() && !app.State.Exit {
 		app.Context.Events.Poll()
@@ -149,6 +149,7 @@ func main() {
 			updated_to = updated_to.Add(step)
 		}
 		current_time = current_time.Add(step)
+		time.Sleep(current_time.Sub(time.Now()))
 		app.Draw()
 		app.Context.SwapBuffers()
 	}
