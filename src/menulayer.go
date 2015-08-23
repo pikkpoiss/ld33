@@ -28,30 +28,34 @@ const (
 const (
 	ExitCode int32 = iota
 	DebugCode
+	WinCode
+	LoseCode
 )
 
 type MenuLayer struct {
-	visible  bool
-	menu     *twodee.Menu
-	text     *twodee.TextRenderer
-	regfont  *twodee.FontFace
-	cache    map[int]*twodee.TextCache
-	hicache  *twodee.TextCache
-	actcache *twodee.TextCache
-	camera   *twodee.Camera
-	state    *State
-	app      *Application
+	visible   bool
+	menu      *twodee.Menu
+	debugMenu *twodee.Menu
+	text      *twodee.TextRenderer
+	regfont   *twodee.FontFace
+	cache     map[int]*twodee.TextCache
+	hicache   *twodee.TextCache
+	actcache  *twodee.TextCache
+	camera    *twodee.Camera
+	state     *State
+	app       *Application
 }
 
 func NewMenuLayer(winb twodee.Rectangle, state *State, app *Application) (layer *MenuLayer, err error) {
 	var (
-		camera  *twodee.Camera
-		menu    *twodee.Menu
-		regfont *twodee.FontFace
-		hifont  *twodee.FontFace
-		actfont *twodee.FontFace
-		bg      = color.Transparent
-		font    = "resources/fonts/Prototype.ttf"
+		camera    *twodee.Camera
+		menu      *twodee.Menu
+		debugMenu *twodee.Menu
+		regfont   *twodee.FontFace
+		hifont    *twodee.FontFace
+		actfont   *twodee.FontFace
+		bg        = color.Transparent
+		font      = "resources/fonts/Prototype.ttf"
 	)
 	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{200, 200, 200, 255}, bg); err != nil {
 		return
@@ -63,8 +67,16 @@ func NewMenuLayer(winb twodee.Rectangle, state *State, app *Application) (layer 
 		return
 	}
 	menu, err = twodee.NewMenu([]twodee.MenuItem{
-		twodee.NewKeyValueMenuItem("Debug", ProgramCode, DebugCode),
 		twodee.NewKeyValueMenuItem("Exit", ProgramCode, ExitCode),
+		twodee.NewKeyValueMenuItem("Debug", ProgramCode, DebugCode),
+	})
+	if err != nil {
+		return
+	}
+	debugMenu, err = twodee.NewMenu([]twodee.MenuItem{
+		twodee.NewKeyValueMenuItem("Exit debug", ProgramCode, DebugCode),
+		twodee.NewKeyValueMenuItem("Win", ProgramCode, WinCode),
+		twodee.NewKeyValueMenuItem("Lose", ProgramCode, LoseCode),
 	})
 	if err != nil {
 		return
@@ -73,15 +85,16 @@ func NewMenuLayer(winb twodee.Rectangle, state *State, app *Application) (layer 
 		return
 	}
 	layer = &MenuLayer{
-		app:      app,
-		menu:     menu,
-		regfont:  regfont,
-		cache:    map[int]*twodee.TextCache{},
-		actcache: twodee.NewTextCache(actfont),
-		hicache:  twodee.NewTextCache(hifont),
-		camera:   camera,
-		state:    state,
-		visible:  false,
+		app:       app,
+		menu:      menu,
+		debugMenu: debugMenu,
+		regfont:   regfont,
+		cache:     map[int]*twodee.TextCache{},
+		actcache:  twodee.NewTextCache(actfont),
+		hicache:   twodee.NewTextCache(hifont),
+		camera:    camera,
+		state:     state,
+		visible:   false,
 	}
 	err = layer.Reset()
 	return
@@ -111,6 +124,14 @@ func (ml *MenuLayer) Delete() {
 	}
 }
 
+func (ml *MenuLayer) CurrentMenu() *twodee.Menu {
+	if ml.state.Debug {
+		return ml.debugMenu
+	} else {
+		return ml.menu
+	}
+}
+
 func (ml *MenuLayer) Render() {
 	if !ml.visible {
 		return
@@ -120,9 +141,10 @@ func (ml *MenuLayer) Render() {
 		texture   *twodee.Texture
 		ok        bool
 		y         = ml.camera.WorldBounds.Max.Y()
+		menu      = ml.CurrentMenu()
 	)
 	ml.text.Bind()
-	for i, item := range ml.menu.Items() {
+	for i, item := range menu.Items() {
 		if item.Highlighted() {
 			ml.hicache.SetText(item.Label())
 			texture = ml.hicache.Texture
@@ -155,7 +177,7 @@ func (ml *MenuLayer) HandleEvent(evt twodee.Event) bool {
 				break
 			}
 			if event.Code == twodee.KeyEscape {
-				ml.menu.Reset()
+				ml.CurrentMenu().Reset()
 				ml.visible = true
 			}
 		}
@@ -166,7 +188,7 @@ func (ml *MenuLayer) HandleEvent(evt twodee.Event) bool {
 		if event.Type != twodee.Press {
 			break
 		}
-		if data := ml.menu.Select(); data != nil {
+		if data := ml.CurrentMenu().Select(); data != nil {
 			ml.handleMenuItem(data)
 		}
 	case *twodee.MouseMoveEvent:
@@ -177,7 +199,7 @@ func (ml *MenuLayer) HandleEvent(evt twodee.Event) bool {
 			textcache *twodee.TextCache
 			ok        bool
 		)
-		for i, item := range ml.menu.Items() {
+		for i, item := range ml.CurrentMenu().Items() {
 			if item.Highlighted() {
 				texture = ml.hicache.Texture
 			} else if item.Active() {
@@ -191,7 +213,7 @@ func (ml *MenuLayer) HandleEvent(evt twodee.Event) bool {
 				y = y - float32(texture.Height)
 				if my >= y {
 					if !item.Highlighted() {
-						ml.menu.HighlightItem(item)
+						ml.CurrentMenu().HighlightItem(item)
 					}
 					break
 				}
@@ -206,13 +228,13 @@ func (ml *MenuLayer) HandleEvent(evt twodee.Event) bool {
 			ml.visible = false
 			return false
 		case twodee.KeyUp:
-			ml.menu.Prev()
+			ml.CurrentMenu().Prev()
 			return false
 		case twodee.KeyDown:
-			ml.menu.Next()
+			ml.CurrentMenu().Next()
 			return false
 		case twodee.KeyEnter:
-			if data := ml.menu.Select(); data != nil {
+			if data := ml.CurrentMenu().Select(); data != nil {
 				ml.handleMenuItem(data)
 			}
 			return false
@@ -229,6 +251,12 @@ func (ml *MenuLayer) handleMenuItem(data *twodee.MenuItemData) {
 			ml.state.Exit = true
 		case DebugCode:
 			ml.state.Debug = !ml.state.Debug
+			ml.visible = false
+		case WinCode:
+			ml.state.SplashState = SplashWin
+			ml.visible = false
+		case LoseCode:
+			ml.state.SplashState = SplashLose
 			ml.visible = false
 		}
 	default:
