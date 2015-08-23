@@ -63,7 +63,7 @@ func (g *Grid) AddSource(pt Ivec2) {
 }
 
 func (g *Grid) SetSink(pt Ivec2) {
-	g.Set(pt, NewGridItem(false, "special_squares_00", nil))
+	g.Set(pt, NewGridItem(false, "gate_00", nil))
 	g.sink = pt
 }
 

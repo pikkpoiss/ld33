@@ -86,7 +86,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 			NewSpawnZone(Ivec2{4, 14}),
 			NewSpawnZone(Ivec2{4, 4}),
 		}
-		exit        = NewSpawnZone(Ivec2{20, 10})
+		exit        = NewSpawnZone(Ivec2{24, 9})
 		fearHistory = make([]float64, 100)
 	)
 	if grid, err = NewGrid(); err != nil {
