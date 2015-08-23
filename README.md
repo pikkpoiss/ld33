@@ -6,12 +6,12 @@
 
 - [x] Render a basic grid level
 - [x] Render player cursor
-- [] Ability to pick & place blocks
-- [] Enum for block types
+- [x] Ability to pick & place blocks
+- [x] Enum for block types
 - [] Icons for different blocks
-- [] Blocks should have "stats"
+- [x] Blocks should have "stats"
 - [] Ability to pick up (delete?) blocks?
-- [] Track placed blocks in level
+- [x] Track placed blocks in level
 - [] Ring effect around block showing radius of effect (also placement grid and another color for things which would be deleted?)
 - [x] Mobs spawning and despawning
 - [x] Mob "spawner". Perhaps several entrances?
