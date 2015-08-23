@@ -16,9 +16,23 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
+	"sort"
 )
+
+type ByY []twodee.SpriteConfig
+
+func (a ByY) Len() int      { return len(a) }
+func (a ByY) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a ByY) Less(i, j int) bool {
+	if a[i].View.Z == a[j].View.Z {
+		if int(a[i].View.Y) == int(a[j].View.Y) {
+			return a[i].View.X < a[j].View.X
+		}
+		return a[i].View.Y > a[j].View.Y
+	}
+	return a[i].View.Z < a[j].View.Z
+}
 
 type GameRenderer struct {
 	sheet   *twodee.Spritesheet
@@ -50,14 +64,28 @@ func (r *GameRenderer) Delete() {
 
 func (r *GameRenderer) Draw(level *Level) {
 	var (
-		configs = []twodee.SpriteConfig{}
+		count   = level.Grid.Width() * level.Grid.Height()
+		configs = make([]twodee.SpriteConfig, 0, count)
+		bgs     = make([]twodee.SpriteConfig, 0, count)
 		x       int32
 		y       int32
 		item    *GridItem
+		pt      Ivec2
 	)
 	for x = 0; x < level.Grid.Width(); x++ {
 		for y = 0; y < level.Grid.Height(); y++ {
-			item = level.Grid.Get(Ivec2{x, y})
+			pt = Ivec2{x, y}
+			item = level.Grid.GetBg(pt)
+			bgs = append(bgs, r.gridSpriteConfig(
+				r.sheet,
+				float32(x),
+				float32(y),
+				item,
+			))
+			item = level.Grid.Get(pt)
+			if item == nil {
+				continue
+			}
 			configs = append(configs, r.gridSpriteConfig(
 				r.sheet,
 				float32(x),
@@ -73,7 +101,9 @@ func (r *GameRenderer) Draw(level *Level) {
 		configs = append(configs, mob.SpriteConfig(r.sheet))
 	}
 	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
+	sort.Sort(ByY(configs))
 	r.effects.Bind()
+	r.sprite.Draw(bgs)
 	r.sprite.Draw(configs)
 	r.effects.Unbind()
 	r.effects.Draw()
@@ -83,7 +113,7 @@ func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 	frame := sheet.GetFrame(cursor)
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			pt.X(), pt.Y(), 0,
+			pt.X(), pt.Y(), 0.2,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
@@ -93,16 +123,10 @@ func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 
 func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
-	if !item.Passable() {
-		frame = sheet.GetFrame("special_squares_00")
-	} else if item.Distance() >= 0 && item.Distance() < 15 {
-		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
-	} else {
-		frame = sheet.GetFrame(item.Frame)
-	}
+	frame = sheet.GetFrame(item.Frame)
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x + frame.Width/2.0, y + frame.Height/2.0, 0,
+			x + frame.Width/2.0, y + frame.Height/2.0, 0.0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

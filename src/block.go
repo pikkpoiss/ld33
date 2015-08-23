@@ -25,7 +25,7 @@ var (
 	OneBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "skeleton01_00"},
 			},
 		},
 		Ivec2{0, 0},
