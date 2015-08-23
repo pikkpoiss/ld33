@@ -73,6 +73,9 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 		}
 		exit = NewSpawnZone(Ivec2{20, 10})
 	)
+	if grid, err = NewGrid(); err != nil {
+		return
+	}
 	for _, entry := range entries {
 		grid.AddSource(entry.Pos)
 	}
@@ -80,9 +83,6 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 
 	for i := 0; i < MaxMobs; i++ {
 		mobs[i] = *NewMob(sheet)
-	}
-	if grid, err = NewGrid(); err != nil {
-		return
 	}
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
