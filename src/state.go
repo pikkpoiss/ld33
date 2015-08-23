@@ -14,18 +14,26 @@
 
 package main
 
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
+
 type State struct {
-	Exit   bool
-	Geld   int
-	Rating int
-	Debug  bool
+	Exit        bool
+	Geld        int
+	Rating      int
+	Debug       bool
+	MousePos    mgl32.Vec2
+	MouseCursor string
 }
 
 func NewState() *State {
 	return &State{
-		Exit:   false,
-		Geld:   100,
-		Rating: 5,
-		Debug:  false,
+		Exit:        false,
+		Geld:        100,
+		Rating:      5,
+		Debug:       false,
+		MousePos:    mgl32.Vec2{0, 0},
+		MouseCursor: "mouse_00",
 	}
 }

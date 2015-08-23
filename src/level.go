@@ -66,9 +66,7 @@ type Level struct {
 	Decals           []*Decal
 	ActiveMobCount   int
 	ActiveDecalCount int
-	MousePos         mgl32.Vec2
 	Highlights       []Highlight
-	cursor           string
 	entries          []SpawnZone
 	exit             SpawnZone
 	blocks           map[Ivec2]BlockPlacement
@@ -192,7 +190,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 					// Mob has been scared to death.
 					// TODO: uhhh this should be prettier.
 					killed = append(killed, i)
-					l.AddDecal(mob.Pos.Add(mgl32.Vec2{0,0.5}), "ghost01_00", 2, 2 * time.Second)
+					l.AddDecal(mob.Pos.Add(mgl32.Vec2{0, 0.5}), "ghost01_00", 2, 2*time.Second)
 				}
 			}
 		}
@@ -221,19 +219,19 @@ func (l *Level) Update(elapsed time.Duration) {
 
 func (l *Level) SetMouse(screenX, screenY float32) {
 	x, y := l.Camera.ScreenToWorldCoords(screenX, screenY)
-	l.MousePos = mgl32.Vec2{x, y}
+	l.State.MousePos = mgl32.Vec2{x, y}
 }
 
 func (l *Level) GetMouse() mgl32.Vec2 {
-	return l.MousePos
+	return l.State.MousePos
 }
 
 func (l *Level) SetCursor(frame string) {
-	l.cursor = frame
+	l.State.MouseCursor = frame
 }
 
 func (l *Level) GetCursor() string {
-	return l.cursor
+	return l.State.MouseCursor
 }
 
 func (l *Level) SetBlock(pos mgl32.Vec2, block *Block, variant int) {
@@ -303,9 +301,9 @@ func (l *Level) despawnMob(i int) {
 	var fear = l.Mobs[i].Fear
 	switch {
 	case fear < 5:
-		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_00", 1, 500 * time.Millisecond)
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_00", 1, 500*time.Millisecond)
 	case fear > 8:
-		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_01", 1, 500 * time.Millisecond)
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_01", 1, 500*time.Millisecond)
 	}
 	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)

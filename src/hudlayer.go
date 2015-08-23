@@ -17,6 +17,7 @@ package main
 import (
 	"../lib/twodee"
 	"fmt"
+	"github.com/go-gl/mathgl/mgl32"
 	"image/color"
 	"io/ioutil"
 	"strconv"
@@ -156,6 +157,11 @@ func (h *HudLayer) Render() {
 			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, ySprite))
 		}
 	}
+	configs = append(
+		configs,
+		h.cursorSpriteConfig(h.spriteSheet, h.state.MousePos, h.state.MouseCursor),
+	)
+
 	h.spriteRenderer.Draw(configs)
 	h.spriteTexture.Unbind()
 
@@ -217,6 +223,18 @@ func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32,
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			xPosition, yPosition, 0,
+			0, 0, 0,
+			1.0, 1.0, 1.0,
+		},
+		Frame: frame.Frame,
+	}
+}
+
+func (h *HudLayer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
+	frame := sheet.GetFrame(cursor)
+	return twodee.SpriteConfig{
+		View: twodee.ModelViewConfig{
+			pt.X(), pt.Y(), 0.2,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

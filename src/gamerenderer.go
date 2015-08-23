@@ -17,7 +17,6 @@ package main
 import (
 	"../lib/twodee"
 	"fmt"
-	"github.com/go-gl/mathgl/mgl32"
 	"sort"
 )
 
@@ -117,10 +116,6 @@ func (r *GameRenderer) Draw(level *Level) {
 			r.highlightSpriteConfig(r.sheet, highlight.Pos, highlight.Frame),
 		)
 	}
-	r.spritesDecals = append(
-		r.spritesDecals,
-		r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()),
-	)
 	sort.Sort(ByY(r.spritesDynamic))
 	r.effects.Bind()
 	r.sprite.Draw(r.spritesStatic)
@@ -128,7 +123,9 @@ func (r *GameRenderer) Draw(level *Level) {
 		r.sprite.Draw(r.spritesHighlight)
 	}
 	r.sprite.Draw(r.spritesDynamic)
-	r.sprite.Draw(r.spritesDecals)
+	if len(r.spritesDecals) > 0 {
+		r.sprite.Draw(r.spritesDecals)
+	}
 	r.effects.Unbind()
 	r.effects.Draw()
 }
@@ -138,18 +135,6 @@ func (r *GameRenderer) highlightSpriteConfig(sheet *twodee.Spritesheet, pt Ivec2
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			float32(pt.X()) + frame.Width/2.0, float32(pt.Y()) + frame.Height/2.0, 0.0,
-			0, 0, 0,
-			1.0, 1.0, 1.0,
-		},
-		Frame: frame.Frame,
-	}
-}
-
-func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
-	frame := sheet.GetFrame(cursor)
-	return twodee.SpriteConfig{
-		View: twodee.ModelViewConfig{
-			pt.X(), pt.Y(), 0.2,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
