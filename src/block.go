@@ -24,6 +24,12 @@ const (
 	BlockScaring
 )
 
+type BlockPlacement struct {
+	Pos Ivec2
+	Block   *Block
+	Variant int
+}
+
 type BlockAnimations map[BlockState][]int
 
 var (
@@ -72,6 +78,7 @@ type Block struct {
 	MaxTargets int     // -1 for infinite.
 	FearPerSec float64 // Amount of fear added to target per second.
 	Cost       int
+	Title      string
 }
 
 var (
@@ -88,6 +95,7 @@ var (
 		MaxTargets: 1,
 		FearPerSec: 2.0,
 		Cost:       10,
+		Title:      "Mr. Bones",
 	}
 
 	SpikesBlock = Block{
@@ -108,6 +116,7 @@ var (
 		MaxTargets: 3,
 		FearPerSec: 0.5,
 		Cost:       100,
+		Title:      "Spiketron 5000",
 	}
 
 	CornerBlock = Block{
@@ -138,5 +147,6 @@ var (
 		MaxTargets: 3,
 		FearPerSec: 0.5,
 		Cost:       100,
+		Title:      "Spiketron 6000 GT",
 	}
 )

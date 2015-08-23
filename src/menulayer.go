@@ -138,7 +138,7 @@ func (ml *MenuLayer) Render() {
 		}
 		if texture != nil {
 			y = y - float32(texture.Height)
-			ml.text.Draw(texture, 0, y)
+			ml.text.Draw(texture, 0, y, 1)
 		}
 	}
 	ml.text.Unbind()

@@ -24,9 +24,15 @@ import (
 	"time"
 )
 
+type HudItem struct {
+	HitBox      twodee.Rectangle
+	Enabled     bool
+	Highlighted bool
+	Block       *Block
+}
+
 type HudLayer struct {
-	textCamera     *twodee.Camera
-	spriteCamera   *twodee.Camera
+	camera         *twodee.Camera
 	textRenderer   *twodee.TextRenderer
 	regFont        *twodee.FontFace
 	pixelFont      *twodee.FontFace
@@ -36,6 +42,8 @@ type HudLayer struct {
 	state          *State
 	app            *Application
 	textCache      map[string]*twodee.TextCache
+	items          []HudItem
+	textScale      float32
 }
 
 func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, err error) {
@@ -45,37 +53,33 @@ func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, e
 		bg             = color.Transparent
 		regFontPath    = "resources/fonts/Prototype.ttf"
 		pixelFontPath  = "resources/fonts/slkscr.ttf"
-		textCamera     *twodee.Camera
-		spriteCamera   *twodee.Camera
-		regFontColor   = color.RGBA{0, 0, 0, 255}
-		pixelFontColor = color.RGBA{0, 0, 0, 255}
+		camera         *twodee.Camera
+		regFontColor           = color.RGBA{0, 0, 0, 255}
+		pixelFontColor         = color.RGBA{0, 0, 0, 255}
+		textScale      float32 = 1.0 / 32.0
+		textSize               = 32.0
 	)
-	if textCamera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
-		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
-	); err != nil {
-		return
-	}
-	if spriteCamera, err = twodee.NewCamera(
+	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
+		//twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 	); err != nil {
 		return
 	}
-	if regFont, err = twodee.NewFontFace(regFontPath, 32, regFontColor, bg); err != nil {
+	if regFont, err = twodee.NewFontFace(regFontPath, textSize, regFontColor, bg); err != nil {
 		return
 	}
-	if pixelFont, err = twodee.NewFontFace(pixelFontPath, 32, pixelFontColor, bg); err != nil {
+	if pixelFont, err = twodee.NewFontFace(pixelFontPath, textSize, pixelFontColor, bg); err != nil {
 		return
 	}
 	layer = &HudLayer{
-		textCamera:   textCamera,
-		spriteCamera: spriteCamera,
-		regFont:      regFont,
-		pixelFont:    pixelFont,
-		state:        state,
-		app:          app,
-		textCache:    map[string]*twodee.TextCache{},
+		camera:    camera,
+		regFont:   regFont,
+		pixelFont: pixelFont,
+		state:     state,
+		app:       app,
+		textCache: map[string]*twodee.TextCache{},
+		textScale: textScale,
 	}
 	err = layer.Reset()
 	return
@@ -103,92 +107,143 @@ func (h *HudLayer) Render() {
 	hudItems := []string{strconv.Itoa(h.state.Rating), "RATING", strconv.Itoa(h.state.Geld), "GELD"}
 
 	var (
-		configs         = []twodee.SpriteConfig{}
-		texture         *twodee.Texture
-		xText           = h.textCamera.WorldBounds.Max.X()
-		yText           = h.textCamera.WorldBounds.Max.Y()
-		ySprite         = h.spriteCamera.WorldBounds.Max.Y()
-		verticalSpacing = 80
+		configs   = []twodee.SpriteConfig{}
+		texture   *twodee.Texture
+		xText     = h.camera.WorldBounds.Max.X()
+		yText     = h.camera.WorldBounds.Max.Y()
+		texHeight float32
+		texWidth  float32
+		//ySprite         = h.spriteCamera.WorldBounds.Max.Y()
+		//verticalSpacing = 80
 	)
+
+	// Render toolbar for selecting blocks to place
+	h.spriteTexture.Bind()
+
+	for _, item := range h.items {
+		x := item.HitBox.Max.X()
+		y := item.HitBox.Min.Y()
+		switch {
+		case item.Highlighted:
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 4, y))
+			configs = append(configs, h.highlightSpriteConfig(h.spriteSheet, mgl32.Vec2{x, y}, "highlight_00"))
+		case item.Block.Cost <= h.state.Geld:
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 1, y))
+		default:
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, y))
+		}
+	}
+
+	configs = append(
+		configs,
+		h.cursorSpriteConfig(h.spriteSheet, h.state.MousePos, h.state.MouseCursor),
+	)
+
+	if len(configs) > 0 {
+		h.spriteRenderer.Draw(configs)
+	}
+	h.spriteTexture.Unbind()
+
+	// Put text on top
 
 	h.textRenderer.Bind()
 
 	// Render text for toolbar
 	texture = h.cacheText("toolbar", h.regFont, "Toolbar")
 	if texture != nil {
-		h.textRenderer.Draw(texture, 5, yText-float32(texture.Height))
+		h.textRenderer.Draw(texture, 5, yText-float32(texture.Height), h.textScale)
 	}
 
 	// Render text for 'Geld', <Geld Amount>, 'Rating', <Rating Amount>
 	for i, elem := range hudItems {
 		texture = h.cacheText(fmt.Sprintf("toolbar%v", i), h.regFont, elem)
 		if texture != nil {
+			texHeight = float32(texture.Height) * h.textScale
+			texWidth = float32(texture.Width) * h.textScale
 			if i%2 == 0 {
-				xText = xText - (float32(texture.Width) + 10)
+				xText = xText - (texWidth + 1)
 			} else {
-				xText = xText - float32(texture.Width)
+				xText = xText - texWidth
 			}
-			h.textRenderer.Draw(texture, xText, yText-float32(texture.Height))
+			h.textRenderer.Draw(texture, xText, yText-texHeight, h.textScale)
 		}
 	}
 
-	// Render text for each of the available blocks to purchase
-	blocks := []*Block{&SkellyBlock, &SpikesBlock, &CornerBlock}
-	blockCost := 0
-	for i, block := range blocks {
-		blockCost = block.Cost
-		if blockCost <= h.state.Geld {
-			texture = h.cacheText(fmt.Sprintf("key%v", i), h.pixelFont, strconv.Itoa(i+1))
-			if texture != nil {
-				h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*(i+1)))
-			}
+	for i, item := range h.items {
+		texture = h.cacheText(fmt.Sprintf("key%v", i), h.pixelFont, strconv.Itoa(i+1))
+		if texture != nil {
+			h.textRenderer.Draw(texture, item.HitBox.Min.X(), item.HitBox.Min.Y(), h.textScale)
+		}
+		if item.Highlighted {
+			texture = h.cacheText("highlight", h.pixelFont, item.Block.Title)
+			h.textRenderer.Draw(texture, item.HitBox.Max.X() + 1, item.HitBox.Min.Y(), h.textScale)
 		}
 	}
 
 	h.textRenderer.Unbind()
-
-	// Render toolbar for selecting blocks to place
-	h.spriteTexture.Bind()
-	for blockNum, block := range blocks {
-		blockCost = block.Cost
-		if blockCost <= h.state.Geld {
-			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, float32(blockNum), ySprite))
-		} else {
-			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, ySprite))
-		}
-	}
-	configs = append(
-		configs,
-		h.cursorSpriteConfig(h.spriteSheet, h.state.MousePos, h.state.MouseCursor),
-	)
-
-	h.spriteRenderer.Draw(configs)
-	h.spriteTexture.Unbind()
-
 }
 
 func (h *HudLayer) HandleEvent(evt twodee.Event) bool {
+	switch event := evt.(type) {
+	case *twodee.MouseButtonEvent:
+		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
+			for _, item := range h.items {
+				if item.Highlighted {
+					h.app.SetUiState(NewBlockUiState(item.Block))
+					return false
+				}
+			}
+		}
+	}
 	return true
+}
+
+func (h *HudLayer) makeItems() {
+	var (
+		yMax      = h.camera.WorldBounds.Max.Y()
+		blocks    = []*Block{&SkellyBlock, &SpikesBlock, &CornerBlock}
+		block     *Block
+		boxHeight float32 = 2
+		boxWidth  float32 = 2
+		boxOffset float32 = 4
+		bottom    float32
+		top       float32
+		i         int
+	)
+	h.items = make([]HudItem, len(blocks))
+	for i, block = range blocks {
+		top = yMax - (boxHeight*float32(i) + boxOffset)
+		bottom = top - boxHeight
+		h.items[i].Enabled = false
+		h.items[i].Highlighted = false
+		h.items[i].HitBox = twodee.Rect(0, bottom, boxWidth, top)
+		h.items[i].Block = block
+	}
 }
 
 func (h *HudLayer) Reset() (err error) {
 	if h.textRenderer != nil {
 		h.textRenderer.Delete()
 	}
-	if h.textRenderer, err = twodee.NewTextRenderer(h.textCamera); err != nil {
+	if h.textRenderer, err = twodee.NewTextRenderer(h.camera); err != nil {
 		return
 	}
-	if h.spriteRenderer, err = twodee.NewSpriteRenderer(h.spriteCamera); err != nil {
+	if h.spriteRenderer, err = twodee.NewSpriteRenderer(h.camera); err != nil {
 		return
 	}
 	if err = h.loadSpritesheet(); err != nil {
 		return
 	}
+	h.makeItems()
 	return
 }
 
 func (h *HudLayer) Update(elapsed time.Duration) {
-
+	var overlaps bool
+	for i, item := range h.items {
+		overlaps = item.HitBox.ContainsPoint(twodee.Point{h.state.MousePos})
+		h.items[i].Highlighted = overlaps
+	}
 }
 
 func (h *HudLayer) loadSpritesheet() (err error) {
@@ -214,12 +269,10 @@ func (h *HudLayer) loadSpritesheet() (err error) {
 }
 
 func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32, y float32) twodee.SpriteConfig {
-	var toolbarSpriteSpacing float32 = 1.4
-	var toolbarSpriteVerticalOffset float32 = 2.2
 	var frame *twodee.SpritesheetFrame
 	frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", block))
 	xPosition := (frame.Width / 2.0) + 1.2
-	yPosition := y - (block * (frame.Height + toolbarSpriteSpacing)) - toolbarSpriteVerticalOffset
+	yPosition := y + (frame.Height / 2.0) // Bottom aligned
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			xPosition, yPosition, 0,
@@ -234,7 +287,19 @@ func (h *HudLayer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, 
 	frame := sheet.GetFrame(cursor)
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			pt.X(), pt.Y(), 0.2,
+			pt.X(), pt.Y(), 0.0,
+			0, 0, 0,
+			1.0, 1.0, 1.0,
+		},
+		Frame: frame.Frame,
+	}
+}
+
+func (h *HudLayer) highlightSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, name string) twodee.SpriteConfig {
+	frame := sheet.GetFrame(name)
+	return twodee.SpriteConfig{
+		View: twodee.ModelViewConfig{
+			pt.X() + frame.Width/2.0, pt.Y() + frame.Height / 6.0, 0.0, // Left aligned
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
