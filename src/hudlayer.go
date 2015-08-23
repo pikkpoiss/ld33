@@ -55,7 +55,7 @@ func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, e
 	); err != nil {
 		return
 	}
-	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{100, 100, 100, 255}, bg); err != nil {
+	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{0, 0, 0, 200}, bg); err != nil {
 		return
 	}
 	layer = &HudLayer{
@@ -75,16 +75,17 @@ func (h *HudLayer) Delete() {
 }
 
 func (h *HudLayer) Render() {
-	hudItems := []string{strconv.Itoa(h.state.Rating), "YARPS", strconv.Itoa(h.state.Geld), "GELD"}
+	hudItems := []string{strconv.Itoa(h.state.Rating), "RATING", strconv.Itoa(h.state.Geld), "GELD"}
 
 	var (
-		configs   = []twodee.SpriteConfig{}
-		textcache *twodee.TextCache
-		texture   *twodee.Texture
-		xText     = h.textCamera.WorldBounds.Max.X()
-		yText     = h.textCamera.WorldBounds.Max.Y()
-		ySprite   = h.spriteCamera.WorldBounds.Max.Y()
-		blockNum  float32
+		configs         = []twodee.SpriteConfig{}
+		textcache       *twodee.TextCache
+		texture         *twodee.Texture
+		xText           = h.textCamera.WorldBounds.Max.X()
+		yText           = h.textCamera.WorldBounds.Max.Y()
+		ySprite         = h.spriteCamera.WorldBounds.Max.Y()
+		verticalSpacing = 90
+		blockNum        float32
 	)
 
 	h.textRenderer.Bind()
@@ -110,6 +111,16 @@ func (h *HudLayer) Render() {
 			h.textRenderer.Draw(texture, xText, yText-float32(texture.Height))
 		}
 	}
+
+	// Render text for each of the available blocks to purchase
+	for i := 1; i < 4; i++ {
+		textcache.SetText(strconv.Itoa(i))
+		texture = textcache.Texture
+		if texture != nil {
+			h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*i))
+		}
+	}
+
 	h.textRenderer.Unbind()
 
 	// Render toolbar for selecting blocks to place
@@ -169,10 +180,12 @@ func (h *HudLayer) loadSpritesheet() (err error) {
 }
 
 func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32, y float32) twodee.SpriteConfig {
+	var toolbarSpriteSpacing float32 = 0.8
+	var toolbarSpriteVerticalOffset float32 = 2.4
 	var frame *twodee.SpritesheetFrame
 	frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", block))
-	xPosition := (frame.Width / 2.0) + 0.75
-	yPosition := y - (block * (frame.Height + 0.5)) - 2.5
+	xPosition := (frame.Width / 2.0) + 1
+	yPosition := y - (block * (frame.Height + toolbarSpriteSpacing)) - toolbarSpriteVerticalOffset
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			xPosition, yPosition, 0,
