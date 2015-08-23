@@ -101,10 +101,32 @@ func (g *Grid) SetBlock(origin Ivec2, block *Block) (Ivec2, bool) {
 	}
 	for y := 0; y < len(block.Template); y++ {
 		for x := 0; x < len(block.Template[y]); x++ {
-			g.Set(pt.Plus(Ivec2{int32(x), int32(y)}), block.Template[y][x])
+			tmpl := block.Template[y][x]
+			if tmpl == nil {
+				continue
+			}
+			item := NewGridItem(tmpl.Passable, tmpl.Frame, tmpl.Frames)
+			g.Set(
+				pt.Plus(Ivec2{int32(x), int32(y)}),
+				item,
+			)
 		}
 	}
 	return pt, true
+}
+
+func (g *Grid) UpdateBlockState(origin Ivec2, block *Block, state BlockState) {
+	var (
+		item *GridItem
+	)
+	for y := 0; y < len(block.Template); y++ {
+		for x := 0; x < len(block.Template[y]); x++ {
+			item = g.Get(origin.Plus(Ivec2{int32(x), int32(y)}))
+			if item != nil {
+				item.SetState(state)
+			}
+		}
+	}
 }
 
 func (g *Grid) Width() int32 {

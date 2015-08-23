@@ -16,9 +16,49 @@ package main
 
 import ()
 
+type BlockState int32
+
+const (
+	_                      = iota
+	BlockNormal BlockState = 1 << iota
+	BlockScaring
+)
+
+type BlockAnimations map[BlockState][]int
+
+var (
+	SkeletonAnimations = BlockAnimations{
+		BlockNormal:  []int{0},
+		BlockScaring: []int{1, 2, 3, 4},
+	}
+	SkeletonTemplate = &BlockTemplate{
+		false,
+		"skeleton01_%02v",
+		SkeletonAnimations,
+	}
+)
+
+var (
+	SpikesAnimations = BlockAnimations{
+		BlockNormal:  []int{0},
+		BlockScaring: []int{1, 2, 3, 3, 3, 3, 3, 0, 0, 0, 0},
+	}
+	SpikesTemplate = &BlockTemplate{
+		false,
+		"spikes01_%02v",
+		SpikesAnimations,
+	}
+)
+
+type BlockTemplate struct {
+	Passable bool
+	Frame    string
+	Frames   BlockAnimations
+}
+
 // TODO: Introduce a cooldown for scaring people.
 type Block struct {
-	Template   [][]*GridItem
+	Template   [][]*BlockTemplate
 	Offset     Ivec2
 	Range      float32 // Radius of effectiveness.
 	MaxTargets int     // -1 for infinite.
@@ -28,9 +68,9 @@ type Block struct {
 
 var (
 	OneBlock = Block{
-		Template: [][]*GridItem{
-			[]*GridItem{
-				NewGridItem(false, "skeleton01_%02v", []int{1,2,3,4}),
+		Template: [][]*BlockTemplate{
+			[]*BlockTemplate{
+				SkeletonTemplate,
 			},
 		},
 		Offset:     Ivec2{0, 0},
@@ -41,21 +81,21 @@ var (
 	}
 
 	ThreeBlock = Block{
-		Template: [][]*GridItem{
-			[]*GridItem{
-				NewGridItem(false, "spikes01_00", nil),
-				NewGridItem(false, "spikes01_00", nil),
-				NewGridItem(false, "spikes01_00", nil),
+		Template: [][]*BlockTemplate{
+			[]*BlockTemplate{
+				SpikesTemplate,
+				SpikesTemplate,
+				SpikesTemplate,
 			},
-			[]*GridItem{
+			[]*BlockTemplate{
 				nil,
 				nil,
 				nil,
 			},
-			[]*GridItem{
-				NewGridItem(false, "spikes01_00", nil),
-				NewGridItem(false, "spikes01_00", nil),
-				NewGridItem(false, "spikes01_00", nil),
+			[]*BlockTemplate{
+				SpikesTemplate,
+				SpikesTemplate,
+				SpikesTemplate,
 			},
 		},
 		Offset:     Ivec2{-1, -1},

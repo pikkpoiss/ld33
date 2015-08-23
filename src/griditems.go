@@ -16,8 +16,8 @@ package main
 
 import (
 	"../lib/twodee"
-	"time"
 	"fmt"
+	"time"
 )
 
 type GridItem struct {
@@ -25,20 +25,37 @@ type GridItem struct {
 	distance  int32
 	frame     string
 	animation *twodee.FrameAnimation
+	frames    BlockAnimations
+	state     BlockState
 }
 
-func NewGridItem(passable bool, frame string, frames []int) *GridItem {
+func NewGridItem(passable bool, frame string, frames BlockAnimations) *GridItem {
 	var (
 		animation *twodee.FrameAnimation
+		state     = BlockNormal
 	)
-	if len(frames) > 0 {
-		animation = twodee.NewFrameAnimation(100*time.Millisecond, frames)
+	if frames != nil {
+		animation = twodee.NewFrameAnimation(
+			100*time.Millisecond,
+			frames[state],
+		)
 	}
 	return &GridItem{
 		passable:  passable,
 		distance:  -1,
 		frame:     frame,
+		frames:    frames,
 		animation: animation,
+		state:     state,
+	}
+}
+
+func (i *GridItem) SetState(state BlockState) {
+	if state != i.state {
+		if frames, ok := i.frames[state]; ok {
+			i.animation.SetSequence(frames)
+			i.state = state
+		}
 	}
 }
 

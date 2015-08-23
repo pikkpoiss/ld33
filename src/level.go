@@ -190,6 +190,11 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 				}
 			}
 		}
+		if numHit > 0 {
+			l.Grid.UpdateBlockState(pos, block, BlockScaring)
+		} else {
+			l.Grid.UpdateBlockState(pos, block, BlockNormal)
+		}
 		// Iterate from the back because we're doing some swapping and
 		// don't wish to invalidate the rest of our indices.
 		sort.Ints(killed)
