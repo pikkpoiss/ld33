@@ -24,6 +24,7 @@ const (
 	ResumeMusic
 	PlayPlaceBlockEffect
 	PlayMrBonesEffect
+	PlaySpikesEffect
 	PlayDeathEffect
 	PlayerLost
 	SENTINEL

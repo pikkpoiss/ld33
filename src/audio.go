@@ -21,6 +21,7 @@ import (
 
 const (
 	MR_BONES_EFFECT_DURATION float64 = 2
+	SPIKES_EFFECT_DURATION   float64 = 2
 )
 
 type AudioSystem struct {
@@ -28,15 +29,18 @@ type AudioSystem struct {
 	bgm                        *twodee.Music
 	placeBlockEffect           *twodee.SoundEffect
 	mrbonesEffect              *twodee.SoundEffect
+	spikesEffect               *twodee.SoundEffect
 	deathEffect                *twodee.SoundEffect
 	bgmObserverId              int
 	pauseMusicObserverId       int
 	resumeMusicObserverId      int
 	placeBlockEffectObserverId int
 	mrbonesEffectObserverId    int
+	spikesEffectObserverId     int
 	deathEffectObserverId      int
 	musicToggle                int32
 	mrbonesLastPlayed          time.Time
+	spikesLastPlayed           time.Time
 }
 
 func (a *AudioSystem) PlayBackgroundMusic(e twodee.GETyper) {
@@ -77,9 +81,16 @@ func (a *AudioSystem) PlayMrBonesEffect(e twodee.GETyper) {
 	}
 }
 
+func (a *AudioSystem) PlaySpikesEffect(e twodee.GETyper) {
+	if time.Since(a.spikesLastPlayed).Seconds() > SPIKES_EFFECT_DURATION {
+		a.spikesEffect.PlayChannel(4, 1)
+		a.spikesLastPlayed = time.Now()
+	}
+}
+
 func (a *AudioSystem) PlayDeathEffect(e twodee.GETyper) {
-	if a.deathEffect.IsPlaying(4) == 0 {
-		a.deathEffect.PlayChannel(4, 1)
+	if a.deathEffect.IsPlaying(5) == 0 {
+		a.deathEffect.PlayChannel(5, 1)
 	}
 }
 
@@ -89,10 +100,12 @@ func (a *AudioSystem) Delete() {
 	a.app.GameEventHandler.RemoveObserver(ResumeMusic, a.resumeMusicObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayPlaceBlockEffect, a.placeBlockEffectObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayMrBonesEffect, a.mrbonesEffectObserverId)
+	a.app.GameEventHandler.RemoveObserver(PlaySpikesEffect, a.spikesEffectObserverId)
 	a.app.GameEventHandler.RemoveObserver(PlayDeathEffect, a.deathEffectObserverId)
 	a.bgm.Delete()
 	a.placeBlockEffect.Delete()
 	a.mrbonesEffect.Delete()
+	a.spikesEffect.Delete()
 	a.deathEffect.Delete()
 }
 
@@ -101,6 +114,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		bgm              *twodee.Music
 		placeBlockEffect *twodee.SoundEffect
 		mrbonesEffect    *twodee.SoundEffect
+		spikesEffect     *twodee.SoundEffect
 		deathEffect      *twodee.SoundEffect
 	)
 
@@ -116,26 +130,34 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		return
 	}
 
+	if spikesEffect, err = twodee.NewSoundEffect("resources/music/spikes.ogg"); err != nil {
+		return
+	}
+
 	if deathEffect, err = twodee.NewSoundEffect("resources/music/no.ogg"); err != nil {
 		return
 	}
 
 	mrbonesLastPlayed := time.Now()
+	spikesLastPlayed := time.Now()
 
 	audioSystem = &AudioSystem{
 		app:               app,
 		bgm:               bgm,
 		placeBlockEffect:  placeBlockEffect,
 		mrbonesEffect:     mrbonesEffect,
+		spikesEffect:      spikesEffect,
 		deathEffect:       deathEffect,
 		musicToggle:       1,
 		mrbonesLastPlayed: mrbonesLastPlayed,
+		spikesLastPlayed:  spikesLastPlayed,
 	}
 	audioSystem.bgmObserverId = app.GameEventHandler.AddObserver(PlayBackgroundMusic, audioSystem.PlayBackgroundMusic)
 	audioSystem.pauseMusicObserverId = app.GameEventHandler.AddObserver(PauseMusic, audioSystem.PauseMusic)
 	audioSystem.resumeMusicObserverId = app.GameEventHandler.AddObserver(ResumeMusic, audioSystem.ResumeMusic)
 	audioSystem.placeBlockEffectObserverId = app.GameEventHandler.AddObserver(PlayPlaceBlockEffect, audioSystem.PlayPlaceBlockEffect)
 	audioSystem.mrbonesEffectObserverId = app.GameEventHandler.AddObserver(PlayMrBonesEffect, audioSystem.PlayMrBonesEffect)
+	audioSystem.spikesEffectObserverId = app.GameEventHandler.AddObserver(PlaySpikesEffect, audioSystem.PlaySpikesEffect)
 	audioSystem.deathEffectObserverId = app.GameEventHandler.AddObserver(PlayDeathEffect, audioSystem.PlayDeathEffect)
 	return
 }

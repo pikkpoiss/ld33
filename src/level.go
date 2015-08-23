@@ -204,6 +204,10 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 			switch placement.Block.Title {
 			case "Mr. Bones":
 				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayMrBonesEffect))
+			case "Spiketron 5000":
+				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlaySpikesEffect))
+			case "Spiketron 6000 GT":
+				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlaySpikesEffect))
 			}
 		} else {
 			l.Grid.UpdateBlockState(pos, placement.Block, BlockNormal, placement.Variant)
