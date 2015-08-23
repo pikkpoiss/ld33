@@ -95,7 +95,7 @@ func (s *BlockUiState) Register(level *Level) {
 }
 
 func (s *BlockUiState) Unregister(level *Level) {
-	level.ClearHighlights()
+	level.UnsetHighlights()
 }
 
 func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
