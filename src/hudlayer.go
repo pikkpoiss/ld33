@@ -120,10 +120,11 @@ func (h *HudLayer) renderToolbarItems(configs []twodee.SpriteConfig) []twodee.Sp
 }
 
 func (h *HudLayer) renderCursor(configs []twodee.SpriteConfig) []twodee.SpriteConfig {
-	return append(
+	configs = append(
 		configs,
 		h.cursorSpriteConfig(h.spriteSheet, h.state.MousePos, h.state.MouseCursor),
 	)
+	return configs
 }
 
 func (h *HudLayer) renderText() {

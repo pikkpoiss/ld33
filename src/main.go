@@ -73,14 +73,14 @@ func NewApplication() (app *Application, err error) {
 		return
 	}
 	layers.Push(app.gameLayer)
-	if hudlayer, err = NewHudLayer(state, app.gameLayer.level.Grid, app); err != nil {
-		return
-	}
-	layers.Push(hudlayer)
 	if splashlayer, err = NewSplashLayer(state, app, app.gameLayer.level.Grid); err != nil {
 		return
 	}
 	layers.Push(splashlayer)
+	if hudlayer, err = NewHudLayer(state, app.gameLayer.level.Grid, app); err != nil {
+		return
+	}
+	layers.Push(hudlayer)
 	if menulayer, err = NewMenuLayer(winbounds, state, app); err != nil {
 		return
 	}
