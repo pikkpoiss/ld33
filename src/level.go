@@ -23,7 +23,9 @@ import (
 )
 
 const (
-	FAIL_RATING = 0
+	FAIL_RATING  = 0
+	WIN_RATING   = 9
+	WIN_DURATION = 5 * time.Second
 )
 
 type SpawnZone struct {
@@ -74,6 +76,7 @@ type Level struct {
 	fearIndex        int
 	highlighted      *BlockPlacement
 	gameEventHandler *twodee.GameEventHandler
+	durAtWinRating   time.Duration
 }
 
 const (
@@ -135,6 +138,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet, gameEventHandler *twodee.
 		fearHistory:      fearHistory,
 		fearIndex:        0,
 		gameEventHandler: gameEventHandler,
+		durAtWinRating:   0,
 	}
 	return
 }
@@ -223,9 +227,17 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 
 // checkConditions checks to see if the player has lost. If so, it enqueues a
 // PlayerLost event.
-func (l *Level) checkConditions() {
+func (l *Level) checkConditions(elapsed time.Duration) {
 	if l.State.Rating <= FAIL_RATING {
 		l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayerLost))
+	}
+	if l.State.Rating >= WIN_RATING {
+		l.durAtWinRating += elapsed
+		if l.durAtWinRating >= WIN_DURATION {
+			l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayerWon))
+		}
+	} else {
+		l.durAtWinRating = 0
 	}
 }
 
@@ -236,7 +248,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.updateSpawns(elapsed)
 	l.updateDecals(elapsed)
 	l.Grid.Update(elapsed)
-	l.checkConditions()
+	l.checkConditions(elapsed)
 }
 
 func (l *Level) SetMouse(screenX, screenY float32) {

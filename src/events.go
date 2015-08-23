@@ -27,6 +27,7 @@ const (
 	PlaySpikesEffect
 	PlayDeathEffect
 	PlayerLost
+	PlayerWon
 	SENTINEL
 )
 
