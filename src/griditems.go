@@ -14,20 +14,45 @@
 
 package main
 
-import ()
+import (
+	"../lib/twodee"
+	"time"
+	"fmt"
+)
 
 type GridItem struct {
-	passable bool
-	distance int32
-	Frame    string
+	passable  bool
+	distance  int32
+	frame     string
+	animation *twodee.FrameAnimation
 }
 
-func NewGridItem(passable bool, frame string) *GridItem {
-	return &GridItem{
-		passable: passable,
-		distance: -1,
-		Frame:    frame,
+func NewGridItem(passable bool, frame string, frames []int) *GridItem {
+	var (
+		animation *twodee.FrameAnimation
+	)
+	if len(frames) > 0 {
+		animation = twodee.NewFrameAnimation(100*time.Millisecond, frames)
 	}
+	return &GridItem{
+		passable:  passable,
+		distance:  -1,
+		frame:     frame,
+		animation: animation,
+	}
+}
+
+func (i *GridItem) Update(elapsed time.Duration) {
+	if i.animation != nil {
+		i.animation.Update(elapsed)
+	}
+}
+
+func (i *GridItem) Frame() string {
+	if i.animation != nil {
+		return fmt.Sprintf(i.frame, i.animation.Current)
+	}
+	return i.frame
 }
 
 func (i *GridItem) Passable() bool {

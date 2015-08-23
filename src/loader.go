@@ -47,7 +47,7 @@ func LoadTiledMap(path string) (grid *twodee.Grid, err error) {
 				grid.Set(
 					x,
 					y,
-					NewGridItem(true, fmt.Sprintf("tiles_%02v", tile.Index)),
+					NewGridItem(true, fmt.Sprintf("tiles_%02v", tile.Index), nil),
 				)
 			}
 		}

@@ -87,7 +87,7 @@ func (r *GameRenderer) Draw(level *Level) {
 				item,
 			))
 			item = level.Grid.Get(pt)
-			if item == nil || item.Frame == "" {
+			if item == nil || item.Frame() == "" {
 				continue
 			}
 			r.spritesDynamic = append(r.spritesDynamic, r.gridSpriteConfig(
@@ -162,7 +162,7 @@ func (r *GameRenderer) gridSpriteConfig(level *Level, sheet *twodee.Spritesheet,
 	if level.State.Debug && item.Distance() >= 0 && item.Distance() < 16 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
 	} else {
-		frame = sheet.GetFrame(item.Frame)
+		frame = sheet.GetFrame(item.Frame())
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{

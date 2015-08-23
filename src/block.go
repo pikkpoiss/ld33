@@ -30,12 +30,12 @@ var (
 	OneBlock = Block{
 		Template: [][]*GridItem{
 			[]*GridItem{
-				NewGridItem(false, "skeleton01_00"),
+				NewGridItem(false, "skeleton01_%02v", []int{1,2,3,4}),
 			},
 		},
 		Offset:     Ivec2{0, 0},
 		Range:      1.5,
-		MaxTargets:  1,
+		MaxTargets: 1,
 		FearPerSec: 2.0,
 		Cost:       10,
 	}
@@ -43,9 +43,9 @@ var (
 	ThreeBlock = Block{
 		Template: [][]*GridItem{
 			[]*GridItem{
-				NewGridItem(false, "spikes01_00"),
-				NewGridItem(false, "spikes01_00"),
-				NewGridItem(false, "spikes01_00"),
+				NewGridItem(false, "spikes01_00", nil),
+				NewGridItem(false, "spikes01_00", nil),
+				NewGridItem(false, "spikes01_00", nil),
 			},
 			[]*GridItem{
 				nil,
@@ -53,14 +53,14 @@ var (
 				nil,
 			},
 			[]*GridItem{
-				NewGridItem(false, "spikes01_00"),
-				NewGridItem(false, "spikes01_00"),
-				NewGridItem(false, "spikes01_00"),
+				NewGridItem(false, "spikes01_00", nil),
+				NewGridItem(false, "spikes01_00", nil),
+				NewGridItem(false, "spikes01_00", nil),
 			},
 		},
 		Offset:     Ivec2{-1, -1},
 		Range:      5.0,
-		MaxTargets:  3,
+		MaxTargets: 3,
 		FearPerSec: 0.5,
 		Cost:       100,
 	}

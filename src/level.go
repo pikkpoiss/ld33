@@ -205,6 +205,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.updateMobs(elapsed)
 	l.updateSpawns(elapsed)
 	l.updateDecals(elapsed)
+	l.Grid.Update(elapsed)
 }
 
 func (l *Level) SetMouse(screenX, screenY float32) {

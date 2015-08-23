@@ -17,6 +17,7 @@ package main
 import (
 	"../lib/twodee"
 	"github.com/go-gl/mathgl/mgl32"
+	"time"
 )
 
 type Ivec2 [2]int32
@@ -57,12 +58,12 @@ func NewGrid() (g *Grid, err error) {
 }
 
 func (g *Grid) AddSource(pt Ivec2) {
-	g.Set(pt, NewGridItem(false, "special_squares_00"))
+	g.Set(pt, NewGridItem(false, "special_squares_00", nil))
 	g.sources = append(g.sources, pt)
 }
 
 func (g *Grid) SetSink(pt Ivec2) {
-	g.Set(pt, NewGridItem(false, "special_squares_00"))
+	g.Set(pt, NewGridItem(false, "special_squares_00", nil))
 	g.sink = pt
 }
 
@@ -242,4 +243,21 @@ func (g *Grid) getAdjacent(point Ivec2) (points []Ivec2) {
 		points = append(points, adj)
 	}
 	return points
+}
+
+func (g *Grid) Update(elapsed time.Duration) {
+	var (
+		x    int32 = 0
+		y    int32 = 0
+		item *GridItem
+	)
+	for x = 0; x < g.grid.Width; x++ {
+		for y = 0; y < g.grid.Height; y++ {
+			item = g.Get(Ivec2{x, y})
+			if item == nil {
+				continue
+			}
+			item.Update(elapsed)
+		}
+	}
 }
