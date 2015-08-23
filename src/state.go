@@ -24,6 +24,6 @@ func NewState() *State {
 	return &State{
 		Exit:   false,
 		Geld:   0,
-		Rating: 0,
+		Rating: 5,
 	}
 }

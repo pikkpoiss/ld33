@@ -136,7 +136,7 @@ func (l *Level) updateMobs(elapsed time.Duration) {
 
 func (l *Level) updateSpawns(elapsed time.Duration) {
 	// TODO: Calculate amount of charge as f(elapsed, rating)
-	charge := 0.01
+	charge := 0.002 * float64(l.State.Rating)
 	for i := range l.entries {
 		entry := &l.entries[i]
 		entry.AddCharge(charge)

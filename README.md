@@ -16,8 +16,8 @@
 - [x] Mobs spawning and despawning
 - [x] Mob "spawner". Perhaps several entrances?
 - [x] Mobs path to despawn
-- [] Mobs yield gold upon despawn
-- [] "Star rating" review system
+- [x] Mobs yield gold upon despawn
+- [x] "Star rating" review system
 - [] Mobs must be scared within "an inch of their life"
 
 ### Stretch?
