@@ -20,13 +20,41 @@ import (
 	"time"
 )
 
+type SpawnZone struct {
+	Pos    Ivec2
+	charge float64
+}
+
+func (s *SpawnZone) AddCharge(c float64) {
+	s.charge += c
+}
+
+func NewSpawnZone(p Ivec2) SpawnZone {
+	s := SpawnZone{}
+	s.Pos = p
+	return s
+}
+
+// Spawn checks if the SpawnZone has accumulated enough charge to spawn a unit.
+// If so, it returns true and removes the requisite amount of charge from the
+// zone. Otherwise, returns false.
+func (s *SpawnZone) Spawn() bool {
+	remainingCharge := s.charge - 1
+	if remainingCharge > 0 {
+		s.charge = remainingCharge
+	}
+	return remainingCharge > 0
+}
+
 type Level struct {
 	Camera         *twodee.Camera
 	Grid           *Grid
-	Mobs           []*Mob
+	Mobs           []Mob
 	ActiveMobCount int
 	MousePos       mgl32.Vec2
 	cursor         string
+	entries        []SpawnZone
+	exit           SpawnZone
 }
 
 const (
@@ -35,16 +63,27 @@ const (
 
 func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
-		mobs   []*Mob
-		grid   *Grid
-		camera *twodee.Camera
+		mobs    = make([]Mob, MaxMobs)
+		grid    *Grid
+		camera  *twodee.Camera
+		entries = []SpawnZone{
+			NewSpawnZone(Ivec2{4, 9}),
+			NewSpawnZone(Ivec2{4, 14}),
+			NewSpawnZone(Ivec2{4, 4}),
+		}
+		exit = NewSpawnZone(Ivec2{20, 10})
 	)
-	mobs = make([]*Mob, MaxMobs)
-	for i := 0; i < MaxMobs; i++ {
-		mobs[i] = NewMob(sheet)
-	}
 	if grid, err = NewGrid(); err != nil {
 		return
+	}
+	for _, entry := range entries {
+		grid.AddSource(entry.Pos)
+	}
+	grid.SetSink(exit.Pos)
+	grid.CalculateDistances()
+
+	for i := 0; i < MaxMobs; i++ {
+		mobs[i] = *NewMob(sheet)
 	}
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
@@ -52,17 +91,21 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	); err != nil {
 		return
 	}
+
 	level = &Level{
 		Camera:         camera,
 		Grid:           grid,
 		Mobs:           mobs,
 		ActiveMobCount: 0,
+		entries:        entries,
+		exit:           exit,
 	}
 	return
 }
 
 func (l *Level) Update(elapsed time.Duration) {
-	for i, mob := range l.Mobs {
+	for i := range l.Mobs {
+		mob := &l.Mobs[i]
 		if !mob.Enabled { // No enabled mobs after first disabled mob.
 			break
 		}
@@ -70,6 +113,15 @@ func (l *Level) Update(elapsed time.Duration) {
 			l.disableMob(i)
 		} else {
 			mob.Update(elapsed, l)
+		}
+	}
+	// TODO: Calculate amount of charge as f(elapsed, rating)
+	charge := 0.01
+	for i := range l.entries {
+		entry := &l.entries[i]
+		entry.AddCharge(charge)
+		for entry.Spawn() {
+			l.SpawnMob(entry.Pos)
 		}
 	}
 }
@@ -98,6 +150,11 @@ func (l *Level) SetBlock(pos mgl32.Vec2, block *Block) {
 	if l.Grid.SetBlock(gridCoords, block) {
 		l.Grid.CalculateDistances()
 	}
+}
+
+func (l *Level) SpawnMob(v Ivec2) {
+	p := mgl32.Vec2{float32(v.X()), float32(v.Y())}
+	l.AddMob(p)
 }
 
 func (l *Level) AddMob(pos mgl32.Vec2) {

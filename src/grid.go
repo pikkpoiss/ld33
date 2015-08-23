@@ -37,8 +37,8 @@ func (i Ivec2) Plus(a Ivec2) Ivec2 {
 type Grid struct {
 	grid        *twodee.Grid
 	defaultItem *GridItem
-	enter       Ivec2
-	exit        Ivec2
+	sources     []Ivec2
+	sink        Ivec2
 }
 
 func NewGrid() (g *Grid, err error) {
@@ -52,21 +52,17 @@ func NewGrid() (g *Grid, err error) {
 		grid:        grid,
 		defaultItem: &GridItem{true, 0, "tiles_00"},
 	}
-	g.SetEnter(Ivec2{4, 9})
-	g.SetExit(Ivec2{20, 10})
-	g.init()
-	g.CalculateDistances()
 	return
 }
 
-func (g *Grid) SetEnter(pt Ivec2) {
+func (g *Grid) AddSource(pt Ivec2) {
 	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
-	g.enter = pt
+	g.sources = append(g.sources, pt)
 }
 
-func (g *Grid) SetExit(pt Ivec2) {
+func (g *Grid) SetSink(pt Ivec2) {
 	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
-	g.exit = pt
+	g.sink = pt
 }
 
 func (g *Grid) Get(pt Ivec2) (item *GridItem) {
@@ -130,7 +126,7 @@ func (g *Grid) WorldToGrid(worldCoords mgl32.Vec2) Ivec2 {
 	}
 }
 
-func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, valid bool) {
+func (g *Grid) GetNextStepToSink(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, valid bool) {
 	var (
 		gridPt = g.WorldToGrid(pt)
 		points []Ivec2
@@ -154,25 +150,6 @@ func (g *Grid) GetNextStepToExit(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, val
 	return
 }
 
-func (g *Grid) init() {
-	/*
-	var (
-		x    int32
-		y    int32
-		item *GridItem
-		pt   Ivec2
-	)
-	for x = 0; x < g.Width(); x++ {
-		for y = 0; y < g.Height(); y++ {
-			pt = Ivec2{x, y}
-			if item = g.get(pt); item == nil {
-				g.Set(pt, &GridItem{true, -1})
-			}
-		}
-	}
-	*/
-}
-
 func (g *Grid) resetDistances() {
 	var (
 		x    int32
@@ -192,7 +169,7 @@ func (g *Grid) resetDistances() {
 
 func (g *Grid) CalculateDistances() {
 	var (
-		queue       = []Ivec2{g.exit}
+		queue       = []Ivec2{g.sink}
 		dist  int32 = 1
 		item  *GridItem
 	)
