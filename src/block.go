@@ -40,8 +40,14 @@ var (
 
 var (
 	SpikesAnimations = BlockAnimations{
-		BlockNormal:  []int{0},
-		BlockScaring: []int{1, 2, 3, 3, 3, 3, 3, 0, 0, 0, 0},
+		BlockNormal: []int{0},
+		BlockScaring: []int{
+			1,
+			2, 2, 2, 2, 2, 2, 2, 2, 2,
+			3, 3,
+			4, 4,
+			0, 0, 0, 0, 0, 0, 0, 0,
+		},
 	}
 	SpikesTemplate = &BlockTemplate{
 		false,
