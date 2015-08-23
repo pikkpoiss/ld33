@@ -35,7 +35,7 @@ type HudLayer struct {
 	app            *Application
 }
 
-func NewHudLayer(state *State, app *Application) (layer *HudLayer, err error) {
+func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, err error) {
 	var (
 		regfont      *twodee.FontFace
 		bg           = color.Transparent
@@ -50,7 +50,7 @@ func NewHudLayer(state *State, app *Application) (layer *HudLayer, err error) {
 		return
 	}
 	if spriteCamera, err = twodee.NewCamera(
-		twodee.Rect(0, 0, float32(GridWidth), float32(GridHeight)),
+		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 	); err != nil {
 		return
@@ -81,10 +81,10 @@ func (h *HudLayer) Render() {
 		configs   = []twodee.SpriteConfig{}
 		textcache *twodee.TextCache
 		texture   *twodee.Texture
-		xText          = h.textCamera.WorldBounds.Max.X()
-		yText         = h.textCamera.WorldBounds.Max.Y()
-		ySprite = h.spriteCamera.WorldBounds.Max.Y()
-		blockNum float32
+		xText     = h.textCamera.WorldBounds.Max.X()
+		yText     = h.textCamera.WorldBounds.Max.Y()
+		ySprite   = h.spriteCamera.WorldBounds.Max.Y()
+		blockNum  float32
 	)
 
 	h.textRenderer.Bind()
@@ -172,9 +172,7 @@ func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32,
 	var frame *twodee.SpritesheetFrame
 	frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", block))
 	xPosition := (frame.Width / 2.0) + 0.75
-  yPosition := y - (block * (frame.Height + 0.5)) - 2.5
-	fmt.Printf("frame.Width %v frame.Height %v\n", frame.Width, frame.Height)
-	fmt.Printf("y %v\n", y)
+	yPosition := y - (block * (frame.Height + 0.5)) - 2.5
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			xPosition, yPosition, 0,
