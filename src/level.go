@@ -55,6 +55,7 @@ type Level struct {
 	cursor         string
 	entries        []SpawnZone
 	exit           SpawnZone
+	blocks         map[Ivec2]*Block
 }
 
 const (
@@ -99,6 +100,7 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 		ActiveMobCount: 0,
 		entries:        entries,
 		exit:           exit,
+		blocks:         make(map[Ivec2]*Block),
 	}
 	return
 }
@@ -130,13 +132,27 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 }
 
 func (l *Level) updateBlocks(elapsed time.Duration) {
+	for pos, block := range l.blocks {
+		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
+		numHit := 0
+		for i := range l.Mobs {
+			if numHit >= block.MaxTargets {
+				break
+			}
+			mob := &l.Mobs[i]
+			if mob.Pos.Sub(posV).Len() <= block.Range {
+				numHit++
+				// TODO affect mob sanity.
+			}
+		}
+	}
 }
 
 // Update computes a new simulation step for this level.
 func (l *Level) Update(elapsed time.Duration) {
+	l.updateBlocks(elapsed)
 	l.updateMobs(elapsed)
 	l.updateSpawns(elapsed)
-	l.updateBlocks(elapsed)
 }
 
 func (l *Level) SetMouse(screenX, screenY float32) {
@@ -160,7 +176,8 @@ func (l *Level) SetBlock(pos mgl32.Vec2, block *Block) {
 	var (
 		gridCoords = l.Grid.WorldToGrid(pos)
 	)
-	if l.Grid.SetBlock(gridCoords, block) {
+	if center, ok := l.Grid.SetBlock(gridCoords, block); ok {
+		l.blocks[center] = block
 		l.Grid.CalculateDistances()
 	}
 }

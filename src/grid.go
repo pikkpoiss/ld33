@@ -90,19 +90,22 @@ func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
 	return
 }
 
-func (g *Grid) SetBlock(origin Ivec2, block *Block) bool {
+// SetBlock attempts to place the block in a "centered" fashion on the given
+// origin. It returns the calculated center as well as a bool indicating
+// whether placement was successful.
+func (g *Grid) SetBlock(origin Ivec2, block *Block) (Ivec2, bool) {
 	var (
 		pt = origin.Plus(block.Offset)
 	)
 	if !g.IsBlockValid(origin, block) {
-		return false
+		return pt, false
 	}
 	for y := 0; y < len(block.Template); y++ {
 		for x := 0; x < len(block.Template[y]); x++ {
 			g.Set(pt.Plus(Ivec2{int32(x), int32(y)}), block.Template[y][x])
 		}
 	}
-	return true
+	return pt, true
 }
 
 func (g *Grid) Width() int32 {
