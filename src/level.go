@@ -103,7 +103,7 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	return
 }
 
-func (l *Level) Update(elapsed time.Duration) {
+func (l *Level) updateMobs(elapsed time.Duration) {
 	for i := range l.Mobs {
 		mob := &l.Mobs[i]
 		if !mob.Enabled { // No enabled mobs after first disabled mob.
@@ -115,6 +115,9 @@ func (l *Level) Update(elapsed time.Duration) {
 			mob.Update(elapsed, l)
 		}
 	}
+}
+
+func (l *Level) updateSpawns(elapsed time.Duration) {
 	// TODO: Calculate amount of charge as f(elapsed, rating)
 	charge := 0.01
 	for i := range l.entries {
@@ -124,6 +127,16 @@ func (l *Level) Update(elapsed time.Duration) {
 			l.SpawnMob(entry.Pos)
 		}
 	}
+}
+
+func (l *Level) updateBlocks(elapsed time.Duration) {
+}
+
+// Update computes a new simulation step for this level.
+func (l *Level) Update(elapsed time.Duration) {
+	l.updateMobs(elapsed)
+	l.updateSpawns(elapsed)
+	l.updateBlocks(elapsed)
 }
 
 func (l *Level) SetMouse(screenX, screenY float32) {
