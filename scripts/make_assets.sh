@@ -16,6 +16,7 @@ build_aesprite numbered_squares
 build_aesprite special_squares
 build_aesprite human01
 build_aesprite skeleton01
+build_aesprite mouse
 build_aesprite tiles
 build_aesprite tiles "assets/tiled"
 cp assets/*.png tmp/
