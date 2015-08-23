@@ -163,7 +163,7 @@ func (l *Level) updateDecals(elapsed time.Duration) {
 
 func (l *Level) updateSpawns(elapsed time.Duration) {
 	// TODO: Calculate amount of charge as f(elapsed, rating)
-	charge := 0.002 * float64(l.State.Rating)
+	charge := 0.004 * math.Max(float64(l.State.Rating), 1)
 	for i := range l.entries {
 		entry := &l.entries[i]
 		entry.AddCharge(charge)
@@ -191,6 +191,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 					// TODO: uhhh this should be prettier.
 					killed = append(killed, i)
 					l.AddDecal(mob.Pos.Add(mgl32.Vec2{0, 0.5}), "ghost01_00", 2, 2*time.Second)
+					l.State.Rating = l.penalizeRating()
 				}
 			}
 		}
@@ -252,6 +253,15 @@ func (l *Level) calculateRating() int {
 	sum := 0.0
 	for _, v := range l.fearHistory {
 		sum += v
+	}
+	return int(math.Floor(sum/float64(len(l.fearHistory)) + 0.5))
+}
+
+func (l *Level) penalizeRating() int {
+	sum := 0.0
+	for i := range l.fearHistory {
+		l.fearHistory[i] = math.Max(l.fearHistory[i]-1, 0)
+		sum += l.fearHistory[i]
 	}
 	return int(math.Floor(sum/float64(len(l.fearHistory)) + 0.5))
 }
