@@ -16,7 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
 	"math"
 	"sort"
@@ -287,12 +286,11 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 
 func (l *Level) despawnMob(i int) {
 	var fear = l.Mobs[i].Fear
-	fmt.Printf("FEAR: %v\n", fear)
 	switch {
 	case fear < 5:
-		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 2}), "bubble_00")
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_00")
 	case fear > 8:
-		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 2}), "bubble_01")
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_01")
 	}
 	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)

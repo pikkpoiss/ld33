@@ -28,20 +28,20 @@ type Block struct {
 
 var (
 	OneBlock = Block{
-		[][]*GridItem{
+		Template: [][]*GridItem{
 			[]*GridItem{
 				NewGridItem(false, "skeleton01_00"),
 			},
 		},
-		Ivec2{0, 0},
-		1.5,
-		1,
-		4.0,
-		10,
+		Offset:     Ivec2{0, 0},
+		Range:      1.5,
+		MaxTargets:  1,
+		FearPerSec: 2.0,
+		Cost:       10,
 	}
 
 	ThreeBlock = Block{
-		[][]*GridItem{
+		Template: [][]*GridItem{
 			[]*GridItem{
 				NewGridItem(false, "spikes01_00"),
 				NewGridItem(false, "spikes01_00"),
@@ -58,10 +58,10 @@ var (
 				NewGridItem(false, "spikes01_00"),
 			},
 		},
-		Ivec2{-1, -1},
-		5.0,
-		3,
-		0,
-		100,
+		Offset:     Ivec2{-1, -1},
+		Range:      5.0,
+		MaxTargets:  3,
+		FearPerSec: 0.5,
+		Cost:       100,
 	}
 )
