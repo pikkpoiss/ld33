@@ -179,11 +179,11 @@ func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block) {
 	var (
 		pre   = l.Grid.WorldToGrid(pos)
 		post  = pre.Plus(block.Offset)
-		frame = "special_squares_00"
+		frame = "special_squares_02"
 	)
 	l.ClearHighlights()
 	if !l.Grid.IsBlockValid(pre, block) {
-		frame = "special_squares_01"
+		frame = "special_squares_03"
 	}
 	for y := 0; y < len(block.Template); y++ {
 		for x := 0; x < len(block.Template[y]); x++ {

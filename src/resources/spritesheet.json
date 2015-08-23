@@ -298,8 +298,26 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "tiles_00",
+	"filename": "special_squares_02",
 	"frame": {"x":108,"y":36,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "special_squares_03",
+	"frame": {"x":126,"y":36,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "tiles_00",
+	"frame": {"x":144,"y":36,"w":16,"h":16},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
@@ -313,6 +331,6 @@
 	"format": "RGBA8888",
 	"size": {"w":256,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:68f2e304150c1bfdc37e328ffda0995d:c28c859f9d40d8519f0ab71354db0c8a:729adc6043343cfda41c447ce8f464d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:70219d0f474747424670e7cce96fe495:307f26628a3b82ea70ea80fcccac2218:729adc6043343cfda41c447ce8f464d6$"
 }
 }
