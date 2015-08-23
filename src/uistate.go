@@ -32,7 +32,7 @@ func NewNormalUiState() UiState {
 }
 
 func (s *NormalUiState) Register(level *Level) {
-	level.SetCursor("numbered_squares_01")
+	level.SetCursor("mouse_00")
 }
 
 func (s *NormalUiState) Unregister(level *Level) {
@@ -67,7 +67,7 @@ func NewBlockUiState(target *Block) UiState {
 }
 
 func (s *BlockUiState) Register(level *Level) {
-	level.SetCursor("numbered_squares_04")
+	level.SetCursor("mouse_01")
 }
 
 func (s *BlockUiState) Unregister(level *Level) {
