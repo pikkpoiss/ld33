@@ -108,6 +108,7 @@ func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 			if s.target.Cost <= level.State.Geld {
 				level.State.Geld = level.State.Geld - s.target.Cost
 				level.SetBlock(level.GetMouse(), s.target, s.variant)
+				level.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayPlaceBlockEffect))
 			}
 		}
 	case *twodee.KeyEvent:

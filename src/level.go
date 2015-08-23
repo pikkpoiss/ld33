@@ -54,6 +54,7 @@ type Highlight struct {
 }
 
 type Level struct {
+	App              *Application
 	Camera           *twodee.Camera
 	Grid             *Grid
 	State            *State
@@ -75,7 +76,7 @@ const (
 	MaxDecals = 10
 )
 
-func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error) {
+func NewLevel(app *Application, state *State, sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
 		mobs    = make([]Mob, MaxMobs)
 		decals  = make([]*Decal, MaxDecals)
@@ -116,6 +117,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 	}
 
 	level = &Level{
+		App:              app,
 		Camera:           camera,
 		Grid:             grid,
 		State:            state,
@@ -173,7 +175,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, placement := range l.blocks {
 		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
 		fear := placement.Block.FearPerSec * elapsed.Seconds()
-		numHit := 0
+    numHit := 0
 		killed := make([]int, 0, placement.Block.MaxTargets)
 		for i := range l.Mobs {
 			mob := &l.Mobs[i]
@@ -187,12 +189,17 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 					// TODO: uhhh this should be prettier.
 					killed = append(killed, i)
 					l.AddDecal(mob.Pos.Add(mgl32.Vec2{0, 0.5}), "ghost01_00", 2, 2*time.Second)
+					l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayDeathEffect))
 					l.State.Rating = l.penalizeRating()
 				}
 			}
 		}
 		if numHit > 0 {
 			l.Grid.UpdateBlockState(pos, placement.Block, BlockScaring, placement.Variant)
+			switch placement.Block.Title {
+			case "Mr. Bones":
+			  l.App.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayMrBonesEffect))
+			}
 		} else {
 			l.Grid.UpdateBlockState(pos, placement.Block, BlockNormal, placement.Variant)
 		}
