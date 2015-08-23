@@ -16,6 +16,7 @@ package main
 
 import (
 	"../lib/twodee"
+	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
 	"sort"
 )
@@ -77,16 +78,18 @@ func (r *GameRenderer) Draw(level *Level) {
 			pt = Ivec2{x, y}
 			item = level.Grid.GetBg(pt)
 			r.spritesStatic = append(r.spritesStatic, r.gridSpriteConfig(
+				level,
 				r.sheet,
 				float32(x),
 				float32(y),
 				item,
 			))
 			item = level.Grid.Get(pt)
-			if item == nil {
+			if item == nil || item.Frame == "" {
 				continue
 			}
 			r.spritesDynamic = append(r.spritesDynamic, r.gridSpriteConfig(
+				level,
 				r.sheet,
 				float32(x),
 				float32(y),
@@ -145,9 +148,13 @@ func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 	}
 }
 
-func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
+func (r *GameRenderer) gridSpriteConfig(level *Level, sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
-	frame = sheet.GetFrame(item.Frame)
+	if level.State.Debug && item.Distance() >= 0 && item.Distance() < 16 {
+		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
+	} else {
+		frame = sheet.GetFrame(item.Frame)
+	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			x + frame.Width/2.0, y + frame.Height/2.0, 0.0,
