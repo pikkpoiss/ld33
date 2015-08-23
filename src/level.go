@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
 	"math"
+	"sort"
 	"time"
 )
 
@@ -140,7 +141,7 @@ func (l *Level) updateMobs(elapsed time.Duration) {
 			break
 		}
 		if mob.PendingDisable {
-			l.disableMob(i)
+			l.despawnMob(i)
 		} else {
 			mob.Update(elapsed, l)
 		}
@@ -173,17 +174,28 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, block := range l.blocks {
 		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
-		fear := block.FearPerNS * float64(elapsed)
+		fear := block.FearPerSec * elapsed.Seconds()
 		numHit := 0
+		killed := make([]int, 0, block.MaxTargets)
 		for i := range l.Mobs {
-			if numHit >= block.MaxTargets {
+			mob := &l.Mobs[i]
+			if numHit >= block.MaxTargets || !mob.Enabled {
 				break
 			}
-			mob := &l.Mobs[i]
 			if mob.Pos.Sub(posV).Len() <= block.Range {
 				numHit++
-				mob.IncreaseFear(fear)
+				if alive := mob.IncreaseFear(fear); !alive {
+					// Mob has been scared to death.
+					// TODO: uhhh this should be prettier.
+					killed = append(killed, i)
+				}
 			}
+		}
+		// Iterate from the back because we're doing some swapping and
+		// don't wish to invalidate the rest of our indices.
+		sort.Ints(killed)
+		for i := len(killed) - 1; i > -1; i-- {
+			l.disableMob(killed[i])
 		}
 	}
 }
@@ -273,19 +285,23 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 	l.ActiveMobCount++
 }
 
-func (l *Level) disableMob(i int) {
+func (l *Level) despawnMob(i int) {
 	var fear = l.Mobs[i].Fear
 	fmt.Printf("FEAR: %v\n", fear)
 	switch {
 	case fear < 5:
 		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 2}), "bubble_00")
-	case fear > 5:
+	case fear > 8:
 		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 2}), "bubble_01")
 	}
 	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
 	l.State.Rating = l.calculateRating()
-	l.State.Geld = l.State.Geld + int(math.Floor(fear*10.0+0.5))
+	l.State.Geld += int(math.Floor(fear*10.0 + 0.5))
+	l.disableMob(i)
+}
+
+func (l *Level) disableMob(i int) {
 	l.ActiveMobCount--
 	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
 	l.Mobs[l.ActiveMobCount].Disable()
