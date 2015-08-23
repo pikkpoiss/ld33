@@ -108,6 +108,10 @@ func (a *Application) SetUiState(state UiState) {
 	a.gameLayer.SetUiState(state)
 }
 
+func (a *Application) UnsetHighlights() {
+	a.gameLayer.UnsetHighlights()
+}
+
 func (a *Application) ProcessEvents() {
 	var (
 		evt   twodee.Event

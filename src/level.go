@@ -263,7 +263,7 @@ func (l *Level) penalizeRating() int {
 	return int(math.Floor(sum/float64(len(l.fearHistory)) + 0.5))
 }
 
-func (l *Level) ClearHighlights() {
+func (l *Level) clearHighlights() {
 	l.Highlights = l.Highlights[0:0]
 }
 
@@ -276,13 +276,21 @@ func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block, variant int) {
 	l.RefreshHighlights()
 }
 
+func (l *Level) UnsetHighlights() {
+	l.clearHighlights()
+	l.highlighted = nil
+}
+
 func (l *Level) RefreshHighlights() {
+	if l.highlighted == nil {
+		return
+	}
 	var (
 		pre   = l.highlighted.Pos
 		post  = pre.Plus(l.highlighted.Block.Offset)
 		frame = "special_squares_02"
 	)
-	l.ClearHighlights()
+	l.clearHighlights()
 	if !l.Grid.IsBlockValid(*l.highlighted) || l.State.Geld < l.highlighted.Block.Cost {
 		frame = "special_squares_03"
 	}

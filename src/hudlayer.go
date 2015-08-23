@@ -176,7 +176,7 @@ func (h *HudLayer) Render() {
 		}
 		if item.Highlighted {
 			texture = h.cacheText("highlight", h.pixelFont, item.Block.Title)
-			h.textRenderer.Draw(texture, item.HitBox.Max.X() + 1, item.HitBox.Min.Y(), h.textScale)
+			h.textRenderer.Draw(texture, item.HitBox.Max.X()+1, item.HitBox.Min.Y(), h.textScale)
 		}
 	}
 
@@ -243,6 +243,9 @@ func (h *HudLayer) Update(elapsed time.Duration) {
 	for i, item := range h.items {
 		overlaps = item.HitBox.ContainsPoint(twodee.Point{h.state.MousePos})
 		h.items[i].Highlighted = overlaps
+		if overlaps {
+			h.app.UnsetHighlights()
+		}
 	}
 }
 
@@ -299,7 +302,7 @@ func (h *HudLayer) highlightSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec
 	frame := sheet.GetFrame(name)
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			pt.X() + frame.Width/2.0, pt.Y() + frame.Height / 6.0, 0.0, // Left aligned
+			pt.X() + frame.Width/2.0, pt.Y() + frame.Height/6.0, 0.0, // Left aligned
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

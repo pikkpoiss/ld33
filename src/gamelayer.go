@@ -55,6 +55,10 @@ func (l *GameLayer) SetUiState(state UiState) {
 	l.uiState.Register(l.level)
 }
 
+func (l *GameLayer) UnsetHighlights() {
+	l.level.UnsetHighlights()
+}
+
 func (l *GameLayer) HandleEvent(evt twodee.Event) bool {
 	if newState := l.uiState.HandleEvent(l.level, evt); newState != nil {
 		l.SetUiState(newState)
