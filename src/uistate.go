@@ -35,9 +35,13 @@ func (s BaseUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		if event.Type == twodee.Press {
 			switch event.Code {
 			case twodee.Key1:
-				return NewBlockUiState(&OneBlock)
+				if OneBlock.Cost <= level.State.Geld {
+					return NewBlockUiState(&OneBlock)
+				}
 			case twodee.Key2:
-				return NewBlockUiState(&ThreeBlock)
+				if ThreeBlock.Cost <= level.State.Geld {
+					return NewBlockUiState(&ThreeBlock)
+				}
 			case twodee.Key0:
 				return NewNormalUiState()
 			}
@@ -102,7 +106,10 @@ func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		level.SetHighlights(level.GetMouse(), s.target)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
-			level.SetBlock(level.GetMouse(), s.target)
+			if s.target.Cost <= level.State.Geld {
+				level.State.Geld = level.State.Geld - s.target.Cost
+				level.SetBlock(level.GetMouse(), s.target)
+			}
 		}
 	}
 	return nil

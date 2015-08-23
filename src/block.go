@@ -17,8 +17,11 @@ package main
 import ()
 
 type Block struct {
-	Template [][]*GridItem
-	Offset   Ivec2
+	Template   [][]*GridItem
+	Offset     Ivec2
+	Range      float32 // Radius of effectiveness.
+	MaxTargets int     // -1 for infinite.
+	Cost       int
 }
 
 var (
@@ -29,6 +32,9 @@ var (
 			},
 		},
 		Ivec2{0, 0},
+		1.5,
+		1,
+		10,
 	}
 
 	ThreeBlock = Block{
@@ -50,5 +56,8 @@ var (
 			},
 		},
 		Ivec2{-1, -1},
+		5.0,
+		3,
+		100,
 	}
 )
