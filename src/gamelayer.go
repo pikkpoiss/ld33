@@ -51,7 +51,10 @@ func (l *GameLayer) Delete() {
 }
 
 func (l *GameLayer) Render() {
-	if l.state.SplashState != SplashDisabled {
+	switch l.state.SplashState {
+	case SplashWin:
+		fallthrough
+	case SplashLose:
 		return
 	}
 	l.spriteTexture.Bind()
