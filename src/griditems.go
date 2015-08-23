@@ -22,6 +22,14 @@ type GridItem struct {
 	Frame    string
 }
 
+func NewGridItem(passable bool, frame string) *GridItem {
+	return &GridItem{
+		passable: passable,
+		distance: -1,
+		Frame:    frame,
+	}
+}
+
 func (i *GridItem) Passable() bool {
 	return i.passable
 }

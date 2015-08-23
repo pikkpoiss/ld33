@@ -57,12 +57,12 @@ func NewGrid() (g *Grid, err error) {
 }
 
 func (g *Grid) AddSource(pt Ivec2) {
-	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
+	g.Set(pt, NewGridItem(false, "special_squares_00"))
 	g.sources = append(g.sources, pt)
 }
 
 func (g *Grid) SetSink(pt Ivec2) {
-	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
+	g.Set(pt, NewGridItem(false, "special_squares_00"))
 	g.sink = pt
 }
 

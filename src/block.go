@@ -29,7 +29,7 @@ var (
 	OneBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, -1, "skeleton01_00"},
+				NewGridItem(false, "skeleton01_00"),
 			},
 		},
 		Ivec2{0, 0},
@@ -42,9 +42,9 @@ var (
 	ThreeBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, -1, "spikes01_00"},
-				&GridItem{false, -1, "spikes01_00"},
-				&GridItem{false, -1, "spikes01_00"},
+				NewGridItem(false, "spikes01_00"),
+				NewGridItem(false, "spikes01_00"),
+				NewGridItem(false, "spikes01_00"),
 			},
 			[]*GridItem{
 				nil,
@@ -52,9 +52,9 @@ var (
 				nil,
 			},
 			[]*GridItem{
-				&GridItem{false, -1, "spikes01_00"},
-				&GridItem{false, -1, "spikes01_00"},
-				&GridItem{false, -1, "spikes01_00"},
+				NewGridItem(false, "spikes01_00"),
+				NewGridItem(false, "spikes01_00"),
+				NewGridItem(false, "spikes01_00"),
 			},
 		},
 		Ivec2{-1, -1},
