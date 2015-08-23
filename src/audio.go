@@ -62,7 +62,7 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 		bgm *twodee.Music
 	)
 
-	if bgm, err = twodee.NewMusic("resources/music/placeholder-bgm.ogg"); err != nil {
+	if bgm, err = twodee.NewMusic("resources/music/bgm1.ogg"); err != nil {
 		return
 	}
 
