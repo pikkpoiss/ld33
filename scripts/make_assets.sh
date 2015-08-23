@@ -17,6 +17,7 @@ build_aesprite special_squares
 build_aesprite human01
 build_aesprite skeleton01
 build_aesprite spikes01
+build_aesprite bubble
 build_aesprite mouse
 build_aesprite tiles
 build_aesprite tiles "assets/tiled"
