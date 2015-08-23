@@ -256,7 +256,7 @@ func (ml *MenuLayer) handleMenuItem(data *twodee.MenuItemData) {
 			ml.state.SplashState = SplashWin
 			ml.visible = false
 		case LoseCode:
-			ml.state.SplashState = SplashLose
+			ml.app.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayerLost))
 			ml.visible = false
 		}
 	default:
