@@ -22,6 +22,7 @@ type Block struct {
 	Range      float32 // Radius of effectiveness.
 	MaxTargets int     // -1 for infinite.
 	FearPerNS  int     // Amount of fear added to target per nanosecond.
+	Cost       int
 }
 
 var (
@@ -35,6 +36,7 @@ var (
 		1.5,
 		1,
 		0,
+		10,
 	}
 
 	ThreeBlock = Block{
@@ -59,5 +61,6 @@ var (
 		5.0,
 		3,
 		0,
+		100,
 	}
 )
