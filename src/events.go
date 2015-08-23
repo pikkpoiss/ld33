@@ -22,6 +22,7 @@ const (
 	PlayBackgroundMusic twodee.GameEventType = iota
 	PauseMusic
 	ResumeMusic
+	PlayerLost
 	SENTINEL
 )
 
