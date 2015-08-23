@@ -28,8 +28,8 @@ type GameRenderer struct {
 
 func NewGameRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GameRenderer, err error) {
 	var (
-		xsize = int(PxPerUnit) * int(GridWidth)
-		ysize = int(PxPerUnit) * int(GridHeight)
+		xsize = int(PxPerUnit) * int(level.Grid.Width())
+		ysize = int(PxPerUnit) * int(level.Grid.Height())
 	)
 	renderer = &GameRenderer{
 		sheet: sheet,
@@ -98,7 +98,7 @@ func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32,
 	} else if item.Distance() >= 0 && item.Distance() < 15 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
 	} else {
-		frame = sheet.GetFrame("numbered_squares_14")
+		frame = sheet.GetFrame(item.Frame)
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{

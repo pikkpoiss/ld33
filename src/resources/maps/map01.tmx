@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-up" width="32" height="20" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" name="Tiles" tilewidth="16" tileheight="16">
+  <tile id="0">
+   <image width="16" height="16" source="../../../assets/tiled/tiles_00.png"/>
+  </tile>
+ </tileset>
+ <layer name="ground" width="32" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztwwENAAAMw6DOv+kLOSSsmqqqbx6PtAKB
+  </data>
+ </layer>
+</map>

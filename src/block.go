@@ -25,7 +25,7 @@ var (
 	OneBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, 0},
+				&GridItem{false, 0, "special_squares_00"},
 			},
 		},
 		Ivec2{0, 0},
@@ -34,19 +34,19 @@ var (
 	ThreeBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, 0},
-				&GridItem{false, 0},
-				&GridItem{false, 0},
+				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "special_squares_00"},
 			},
 			[]*GridItem{
-				&GridItem{false, 0},
-				&GridItem{false, 0},
-				&GridItem{false, 0},
+				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "special_squares_00"},
 			},
 			[]*GridItem{
-				&GridItem{false, 0},
-				&GridItem{false, 0},
-				&GridItem{false, 0},
+				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, 0, "special_squares_00"},
 			},
 		},
 		Ivec2{-1, -1},
