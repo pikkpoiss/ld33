@@ -16,6 +16,7 @@ package main
 
 import (
 	"../lib/twodee"
+	"fmt"
 	"github.com/go-gl/mathgl/mgl32"
 	"math"
 	"time"
@@ -53,28 +54,32 @@ type Highlight struct {
 }
 
 type Level struct {
-	Camera         *twodee.Camera
-	Grid           *Grid
-	State          *State
-	Mobs           []Mob
-	ActiveMobCount int
-	MousePos       mgl32.Vec2
-	Highlights     []Highlight
-	cursor         string
-	entries        []SpawnZone
-	exit           SpawnZone
-	blocks         map[Ivec2]*Block
-	fearHistory    []float64
-	fearIndex      int
+	Camera           *twodee.Camera
+	Grid             *Grid
+	State            *State
+	Mobs             []Mob
+	Decals           []*Decal
+	ActiveMobCount   int
+	ActiveDecalCount int
+	MousePos         mgl32.Vec2
+	Highlights       []Highlight
+	cursor           string
+	entries          []SpawnZone
+	exit             SpawnZone
+	blocks           map[Ivec2]*Block
+	fearHistory      []float64
+	fearIndex        int
 }
 
 const (
-	MaxMobs = 200
+	MaxMobs   = 200
+	MaxDecals = 10
 )
 
 func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
 		mobs    = make([]Mob, MaxMobs)
+		decals  = make([]*Decal, MaxDecals)
 		grid    *Grid
 		camera  *twodee.Camera
 		entries = []SpawnZone{
@@ -97,6 +102,9 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 	for i := 0; i < MaxMobs; i++ {
 		mobs[i] = *NewMob(sheet)
 	}
+	for i := 0; i < MaxDecals; i++ {
+		decals[i] = NewDecal()
+	}
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
@@ -109,16 +117,18 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 	}
 
 	level = &Level{
-		Camera:         camera,
-		Grid:           grid,
-		State:          state,
-		Mobs:           mobs,
-		ActiveMobCount: 0,
-		entries:        entries,
-		exit:           exit,
-		blocks:         make(map[Ivec2]*Block),
-		fearHistory:    fearHistory,
-		fearIndex:      0,
+		Camera:           camera,
+		Grid:             grid,
+		State:            state,
+		Mobs:             mobs,
+		Decals:           decals,
+		ActiveDecalCount: 0,
+		ActiveMobCount:   0,
+		entries:          entries,
+		exit:             exit,
+		blocks:           make(map[Ivec2]*Block),
+		fearHistory:      fearHistory,
+		fearIndex:        0,
 	}
 	return
 }
@@ -133,6 +143,17 @@ func (l *Level) updateMobs(elapsed time.Duration) {
 			l.disableMob(i)
 		} else {
 			mob.Update(elapsed, l)
+		}
+	}
+}
+
+func (l *Level) updateDecals(elapsed time.Duration) {
+	for i := range l.Decals {
+		decal := l.Decals[i]
+		if decal.PendingDisable {
+			l.disableDecal(i)
+		} else {
+			decal.Update(elapsed)
 		}
 	}
 }
@@ -172,6 +193,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.updateBlocks(elapsed)
 	l.updateMobs(elapsed)
 	l.updateSpawns(elapsed)
+	l.updateDecals(elapsed)
 }
 
 func (l *Level) SetMouse(screenX, screenY float32) {
@@ -252,11 +274,39 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 }
 
 func (l *Level) disableMob(i int) {
-	l.fearHistory[l.fearIndex] = l.Mobs[i].Fear
+	var fear = l.Mobs[i].Fear
+	fmt.Printf("FEAR: %v\n", fear)
+	switch {
+	case fear < 5:
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 2}), "bubble_00")
+	case fear > 5:
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 2}), "bubble_01")
+	}
+	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
 	l.State.Rating = l.calculateRating()
-	l.State.Geld = l.State.Geld + int(math.Floor(l.Mobs[i].Fear*10.0+0.5))
+	l.State.Geld = l.State.Geld + int(math.Floor(fear*10.0+0.5))
 	l.ActiveMobCount--
 	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
 	l.Mobs[l.ActiveMobCount].Disable()
+}
+
+func (l *Level) AddDecal(pos mgl32.Vec2, frame string) {
+	if l.ActiveDecalCount >= MaxDecals {
+		return
+	}
+	l.Decals[l.ActiveDecalCount].Activate(pos, frame, 500*time.Millisecond)
+	l.ActiveDecalCount++
+}
+
+func (l *Level) disableDecal(i int) {
+	if !l.Decals[i].Enabled {
+		return
+	}
+	l.Decals[i].Disable()
+	l.ActiveDecalCount--
+	if l.ActiveDecalCount == i {
+		return
+	}
+	l.Decals[l.ActiveDecalCount], l.Decals[i] = l.Decals[i], l.Decals[l.ActiveDecalCount]
 }

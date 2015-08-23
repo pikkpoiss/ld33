@@ -39,6 +39,7 @@ type GameRenderer struct {
 	spritesDynamic   []twodee.SpriteConfig
 	spritesStatic    []twodee.SpriteConfig
 	spritesHighlight []twodee.SpriteConfig
+	spritesDecals    []twodee.SpriteConfig
 }
 
 func NewGameRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GameRenderer, err error) {
@@ -73,6 +74,7 @@ func (r *GameRenderer) Draw(level *Level) {
 	r.spritesStatic = r.spritesStatic[0:0]
 	r.spritesHighlight = r.spritesHighlight[0:0]
 	r.spritesDynamic = r.spritesDynamic[0:0]
+	r.spritesDecals = r.spritesDecals[0:0]
 	for x = 0; x < level.Grid.Width(); x++ {
 		for y = 0; y < level.Grid.Height(); y++ {
 			pt = Ivec2{x, y}
@@ -103,14 +105,20 @@ func (r *GameRenderer) Draw(level *Level) {
 		}
 		r.spritesDynamic = append(r.spritesDynamic, mob.SpriteConfig(r.sheet))
 	}
+	for _, decal := range level.Decals {
+		if !decal.Enabled {
+			break
+		}
+		r.spritesDecals = append(r.spritesDecals, decal.SpriteConfig(r.sheet))
+	}
 	for _, highlight := range level.Highlights {
 		r.spritesHighlight = append(
 			r.spritesHighlight,
 			r.highlightSpriteConfig(r.sheet, highlight.Pos, highlight.Frame),
 		)
 	}
-	r.spritesDynamic = append(
-		r.spritesDynamic,
+	r.spritesDecals = append(
+		r.spritesDecals,
 		r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()),
 	)
 	sort.Sort(ByY(r.spritesDynamic))
@@ -120,6 +128,7 @@ func (r *GameRenderer) Draw(level *Level) {
 		r.sprite.Draw(r.spritesHighlight)
 	}
 	r.sprite.Draw(r.spritesDynamic)
+	r.sprite.Draw(r.spritesDecals)
 	r.effects.Unbind()
 	r.effects.Draw()
 }
