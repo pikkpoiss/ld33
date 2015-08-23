@@ -19,7 +19,7 @@ import ()
 type GridItem struct {
 	passable bool
 	distance int32
-	Frame string
+	Frame    string
 }
 
 func (i *GridItem) Passable() bool {

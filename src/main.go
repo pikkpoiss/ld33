@@ -76,7 +76,7 @@ func NewApplication() (app *Application, err error) {
 		return
 	}
 	layers.Push(menulayer)
-	if hudlayer, err = NewHudLayer(state, app); err != nil {
+	if hudlayer, err = NewHudLayer(state, gamelayer.level.Grid, app); err != nil {
 		return
 	}
 	layers.Push(hudlayer)
