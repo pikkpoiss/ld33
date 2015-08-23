@@ -31,7 +31,7 @@ var (
 		BlockNormal:  []int{0},
 		BlockScaring: []int{1, 2, 3, 4},
 	}
-	SkeletonTemplate = &BlockTemplate{
+	SkeletonTemplate = &GridItemTemplate{
 		false,
 		"skeleton01_%02v",
 		SkeletonAnimations,
@@ -49,22 +49,24 @@ var (
 			0, 0, 0, 0, 0, 0, 0, 0,
 		},
 	}
-	SpikesTemplate = &BlockTemplate{
+	SpikesTemplate = &GridItemTemplate{
 		false,
 		"spikes01_%02v",
 		SpikesAnimations,
 	}
 )
 
-type BlockTemplate struct {
+type GridItemTemplate struct {
 	Passable bool
 	Frame    string
 	Frames   BlockAnimations
 }
 
+type BlockTemplate [][]*GridItemTemplate
+
 // TODO: Introduce a cooldown for scaring people.
 type Block struct {
-	Template   [][]*BlockTemplate
+	Variants   []BlockTemplate
 	Offset     Ivec2
 	Range      float32 // Radius of effectiveness.
 	MaxTargets int     // -1 for infinite.
@@ -74,9 +76,11 @@ type Block struct {
 
 var (
 	OneBlock = Block{
-		Template: [][]*BlockTemplate{
-			[]*BlockTemplate{
-				SkeletonTemplate,
+		Variants: []BlockTemplate{
+			BlockTemplate{
+				[]*GridItemTemplate{
+					SkeletonTemplate,
+				},
 			},
 		},
 		Offset:     Ivec2{0, 0},
@@ -87,21 +91,16 @@ var (
 	}
 
 	ThreeBlock = Block{
-		Template: [][]*BlockTemplate{
-			[]*BlockTemplate{
-				SpikesTemplate,
-				SpikesTemplate,
-				SpikesTemplate,
+		Variants: []BlockTemplate{
+			BlockTemplate{
+				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
+				[]*GridItemTemplate{nil, nil, nil},
+				[]*GridItemTemplate{SpikesTemplate, SpikesTemplate, SpikesTemplate},
 			},
-			[]*BlockTemplate{
-				nil,
-				nil,
-				nil,
-			},
-			[]*BlockTemplate{
-				SpikesTemplate,
-				SpikesTemplate,
-				SpikesTemplate,
+			BlockTemplate{
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
+				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
 			},
 		},
 		Offset:     Ivec2{-1, -1},

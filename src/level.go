@@ -53,6 +53,11 @@ type Highlight struct {
 	Frame string
 }
 
+type BlockPlacement struct {
+	Block   *Block
+	Variant int
+}
+
 type Level struct {
 	Camera           *twodee.Camera
 	Grid             *Grid
@@ -66,7 +71,7 @@ type Level struct {
 	cursor           string
 	entries          []SpawnZone
 	exit             SpawnZone
-	blocks           map[Ivec2]*Block
+	blocks           map[Ivec2]BlockPlacement
 	fearHistory      []float64
 	fearIndex        int
 }
@@ -126,7 +131,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 		ActiveMobCount:   0,
 		entries:          entries,
 		exit:             exit,
-		blocks:           make(map[Ivec2]*Block),
+		blocks:           make(map[Ivec2]BlockPlacement),
 		fearHistory:      fearHistory,
 		fearIndex:        0,
 	}
@@ -171,17 +176,17 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 }
 
 func (l *Level) updateBlocks(elapsed time.Duration) {
-	for pos, block := range l.blocks {
+	for pos, placement := range l.blocks {
 		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
-		fear := block.FearPerSec * elapsed.Seconds()
+		fear := placement.Block.FearPerSec * elapsed.Seconds()
 		numHit := 0
-		killed := make([]int, 0, block.MaxTargets)
+		killed := make([]int, 0, placement.Block.MaxTargets)
 		for i := range l.Mobs {
 			mob := &l.Mobs[i]
-			if numHit >= block.MaxTargets || !mob.Enabled {
+			if numHit >= placement.Block.MaxTargets || !mob.Enabled {
 				break
 			}
-			if mob.Pos.Sub(posV).Len() <= block.Range {
+			if mob.Pos.Sub(posV).Len() <= placement.Block.Range {
 				numHit++
 				if alive := mob.IncreaseFear(fear); !alive {
 					// Mob has been scared to death.
@@ -191,9 +196,9 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 			}
 		}
 		if numHit > 0 {
-			l.Grid.UpdateBlockState(pos, block, BlockScaring)
+			l.Grid.UpdateBlockState(pos, placement.Block, BlockScaring, placement.Variant)
 		} else {
-			l.Grid.UpdateBlockState(pos, block, BlockNormal)
+			l.Grid.UpdateBlockState(pos, placement.Block, BlockNormal, placement.Variant)
 		}
 		// Iterate from the back because we're doing some swapping and
 		// don't wish to invalidate the rest of our indices.
@@ -230,12 +235,12 @@ func (l *Level) GetCursor() string {
 	return l.cursor
 }
 
-func (l *Level) SetBlock(pos mgl32.Vec2, block *Block) {
+func (l *Level) SetBlock(pos mgl32.Vec2, block *Block, variant int) {
 	var (
 		gridCoords = l.Grid.WorldToGrid(pos)
 	)
-	if center, ok := l.Grid.SetBlock(gridCoords, block); ok {
-		l.blocks[center] = block
+	if center, ok := l.Grid.SetBlock(gridCoords, block, variant); ok {
+		l.blocks[center] = BlockPlacement{block, variant}
 		l.Grid.CalculateDistances()
 	}
 }
@@ -256,18 +261,21 @@ func (l *Level) ClearHighlights() {
 	l.Highlights = l.Highlights[0:0]
 }
 
-func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block) {
+func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block, variant int) {
 	var (
 		pre   = l.Grid.WorldToGrid(pos)
 		post  = pre.Plus(block.Offset)
 		frame = "special_squares_02"
 	)
 	l.ClearHighlights()
-	if !l.Grid.IsBlockValid(pre, block) {
+	if !l.Grid.IsBlockValid(pre, block, variant) {
 		frame = "special_squares_03"
 	}
-	for y := 0; y < len(block.Template); y++ {
-		for x := 0; x < len(block.Template[y]); x++ {
+	for y := 0; y < len(block.Variants[variant]); y++ {
+		for x := 0; x < len(block.Variants[variant][y]); x++ {
+			if block.Variants[variant][y][x] == nil {
+				continue
+			}
 			l.Highlights = append(l.Highlights, Highlight{
 				post.Plus(Ivec2{int32(x), int32(y)}),
 				frame,

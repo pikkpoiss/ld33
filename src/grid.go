@@ -71,14 +71,14 @@ func (g *Grid) Set(pt Ivec2, item *GridItem) {
 	g.grid.Set(pt.X(), pt.Y(), item)
 }
 
-func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
+func (g *Grid) IsBlockValid(origin Ivec2, block *Block, variant int) (ok bool) {
 	var (
 		pt   = origin.Plus(block.Offset)
 		item *GridItem
 	)
 	ok = true
-	for y := 0; y < len(block.Template); y++ {
-		for x := 0; x < len(block.Template[y]); x++ {
+	for y := 0; y < len(block.Variants[variant]); y++ {
+		for x := 0; x < len(block.Variants[variant][y]); x++ {
 			item = g.Get(pt.Plus(Ivec2{int32(x), int32(y)}))
 			if item != nil && !item.Passable() {
 				ok = false
@@ -92,16 +92,16 @@ func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
 // SetBlock attempts to place the block in a "centered" fashion on the given
 // origin. It returns the calculated center as well as a bool indicating
 // whether placement was successful.
-func (g *Grid) SetBlock(origin Ivec2, block *Block) (Ivec2, bool) {
+func (g *Grid) SetBlock(origin Ivec2, block *Block, variant int) (Ivec2, bool) {
 	var (
 		pt = origin.Plus(block.Offset)
 	)
-	if !g.IsBlockValid(origin, block) {
+	if !g.IsBlockValid(origin, block, variant) {
 		return pt, false
 	}
-	for y := 0; y < len(block.Template); y++ {
-		for x := 0; x < len(block.Template[y]); x++ {
-			tmpl := block.Template[y][x]
+	for y := 0; y < len(block.Variants[variant]); y++ {
+		for x := 0; x < len(block.Variants[variant][y]); x++ {
+			tmpl := block.Variants[variant][y][x]
 			if tmpl == nil {
 				continue
 			}
@@ -115,12 +115,12 @@ func (g *Grid) SetBlock(origin Ivec2, block *Block) (Ivec2, bool) {
 	return pt, true
 }
 
-func (g *Grid) UpdateBlockState(origin Ivec2, block *Block, state BlockState) {
+func (g *Grid) UpdateBlockState(origin Ivec2, block *Block, state BlockState, variant int) {
 	var (
 		item *GridItem
 	)
-	for y := 0; y < len(block.Template); y++ {
-		for x := 0; x < len(block.Template[y]); x++ {
+	for y := 0; y < len(block.Variants[variant]); y++ {
+		for x := 0; x < len(block.Variants[variant][y]); x++ {
 			item = g.Get(origin.Plus(Ivec2{int32(x), int32(y)}))
 			if item != nil {
 				item.SetState(state)

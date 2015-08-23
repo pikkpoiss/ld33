@@ -80,12 +80,14 @@ func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 
 type BlockUiState struct {
 	BaseUiState
-	target *Block
+	target  *Block
+	variant int
 }
 
 func NewBlockUiState(target *Block) UiState {
 	return &BlockUiState{
-		target: target,
+		target:  target,
+		variant: 0,
 	}
 }
 
@@ -103,12 +105,20 @@ func (s *BlockUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 	}
 	switch event := evt.(type) {
 	case *twodee.MouseMoveEvent:
-		level.SetHighlights(level.GetMouse(), s.target)
+		level.SetHighlights(level.GetMouse(), s.target, s.variant)
 	case *twodee.MouseButtonEvent:
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			if s.target.Cost <= level.State.Geld {
 				level.State.Geld = level.State.Geld - s.target.Cost
-				level.SetBlock(level.GetMouse(), s.target)
+				level.SetBlock(level.GetMouse(), s.target, s.variant)
+			}
+		}
+	case *twodee.KeyEvent:
+		if event.Type == twodee.Press {
+			switch event.Code {
+			case twodee.KeyR:
+				s.variant = (s.variant + 1) % len(s.target.Variants)
+				level.SetHighlights(level.GetMouse(), s.target, s.variant)
 			}
 		}
 	}
