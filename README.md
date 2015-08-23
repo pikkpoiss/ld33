@@ -14,7 +14,7 @@
 - [] Track placed blocks in level
 - [] Ring effect around block showing radius of effect (also placement grid and another color for things which would be deleted?)
 - [x] Mobs spawning and despawning
-- [] Mob "spawner". Perhaps several entrances?
+- [x] Mob "spawner". Perhaps several entrances?
 - [x] Mobs path to despawn
 - [] Mobs yield gold upon despawn
 - [] "Star rating" review system
