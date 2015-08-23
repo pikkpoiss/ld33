@@ -19,6 +19,7 @@ import ()
 type Block struct {
 	Template [][]*GridItem
 	Offset   Ivec2
+	Cost     int
 }
 
 var (
@@ -29,6 +30,7 @@ var (
 			},
 		},
 		Ivec2{0, 0},
+		10,
 	}
 
 	ThreeBlock = Block{
@@ -50,5 +52,6 @@ var (
 			},
 		},
 		Ivec2{-1, -1},
+		100,
 	}
 )
