@@ -201,7 +201,6 @@ func (h *HudLayer) HandleEvent(evt twodee.Event) bool {
 func (h *HudLayer) makeItems() {
 	var (
 		yMax      = h.camera.WorldBounds.Max.Y()
-		blocks    = []*Block{&SkellyBlock, &SpikesBlock, &CornerBlock}
 		block     *Block
 		boxHeight float32 = 2
 		boxWidth  float32 = 2
@@ -210,8 +209,8 @@ func (h *HudLayer) makeItems() {
 		top       float32
 		i         int
 	)
-	h.items = make([]HudItem, len(blocks))
-	for i, block = range blocks {
+	h.items = make([]HudItem, len(HudBlocks))
+	for i, block = range HudBlocks {
 		top = yMax - (boxHeight*float32(i) + boxOffset)
 		bottom = top - boxHeight
 		h.items[i].Enabled = false

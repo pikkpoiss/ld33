@@ -17,6 +17,7 @@ build_aesprite special_squares
 build_aesprite highlight
 build_aesprite human01
 build_aesprite skeleton01
+build_aesprite box01
 build_aesprite ghost01
 build_aesprite spikes01
 build_aesprite bubble

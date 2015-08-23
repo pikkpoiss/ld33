@@ -33,13 +33,11 @@ func (s BaseUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		level.SetMouse(event.X, event.Y)
 	case *twodee.KeyEvent:
 		if event.Type == twodee.Press {
+			code := int(event.Code - twodee.Key1)
+			if code >= 0 && code < 9 && code < len(HudBlocks) {
+				return NewBlockUiState(HudBlocks[code])
+			}
 			switch event.Code {
-			case twodee.Key1:
-				return NewBlockUiState(&SkellyBlock)
-			case twodee.Key2:
-				return NewBlockUiState(&SpikesBlock)
-			case twodee.Key3:
-				return NewBlockUiState(&CornerBlock)
 			case twodee.Key0:
 				return NewNormalUiState()
 			}

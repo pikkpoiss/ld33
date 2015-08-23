@@ -25,7 +25,7 @@ const (
 )
 
 type BlockPlacement struct {
-	Pos Ivec2
+	Pos     Ivec2
 	Block   *Block
 	Variant int
 }
@@ -59,6 +59,18 @@ var (
 		false,
 		"spikes01_%02v",
 		SpikesAnimations,
+	}
+)
+
+var (
+	BoxAnimations = BlockAnimations{
+		BlockNormal:  []int{0},
+		BlockScaring: []int{0},
+	}
+	BoxTemplate = &GridItemTemplate{
+		false,
+		"box01_%02v",
+		BoxAnimations,
 	}
 )
 
@@ -149,4 +161,22 @@ var (
 		Cost:       100,
 		Title:      "Spiketron 6000 GT",
 	}
+
+	ScaryBox = Block{
+		Variants: []BlockTemplate{
+			BlockTemplate{
+				[]*GridItemTemplate{BoxTemplate},
+			},
+		},
+		Offset:     Ivec2{0, 0},
+		Range:      0.0,
+		MaxTargets: 0,
+		FearPerSec: 0.0,
+		Cost:       50,
+		Title:      "Scary?box",
+	}
+)
+
+var (
+	HudBlocks = []*Block{&SkellyBlock, &SpikesBlock, &CornerBlock, &ScaryBox}
 )
