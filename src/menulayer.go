@@ -57,7 +57,7 @@ func NewMenuLayer(winb twodee.Rectangle, state *State, app *Application) (layer 
 		bg        = color.Transparent
 		font      = "resources/fonts/Prototype.ttf"
 	)
-	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{200, 200, 200, 255}, bg); err != nil {
+	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{64, 64, 64, 255}, bg); err != nil {
 		return
 	}
 	if hifont, err = twodee.NewFontFace(font, 32, color.RGBA{255, 240, 120, 255}, bg); err != nil {
@@ -160,7 +160,7 @@ func (ml *MenuLayer) Render() {
 		}
 		if texture != nil {
 			y = y - float32(texture.Height)
-			ml.text.Draw(texture, 0, y, 1)
+			ml.text.Draw(texture, 10, y, 1)
 		}
 	}
 	ml.text.Unbind()
