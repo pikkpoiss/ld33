@@ -27,21 +27,27 @@ type HudLayer struct {
 	textCamera     *twodee.Camera
 	spriteCamera   *twodee.Camera
 	textRenderer   *twodee.TextRenderer
-	regfont        *twodee.FontFace
+	regFont        *twodee.FontFace
+	pixelFont      *twodee.FontFace
 	spriteSheet    *twodee.Spritesheet
 	spriteTexture  *twodee.Texture
 	spriteRenderer *twodee.SpriteRenderer
 	state          *State
 	app            *Application
+	textCache      map[string]*twodee.TextCache
 }
 
 func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, err error) {
 	var (
-		regfont      *twodee.FontFace
-		bg           = color.Transparent
-		font         = "resources/fonts/Prototype.ttf"
-		textCamera   *twodee.Camera
-		spriteCamera *twodee.Camera
+		regFont        *twodee.FontFace
+		pixelFont      *twodee.FontFace
+		bg             = color.Transparent
+		regFontPath    = "resources/fonts/Prototype.ttf"
+		pixelFontPath  = "resources/fonts/slkscr.ttf"
+		textCamera     *twodee.Camera
+		spriteCamera   *twodee.Camera
+		regFontColor   = color.RGBA{0, 0, 0, 255}
+		pixelFontColor = color.RGBA{0, 0, 0, 255}
 	)
 	if textCamera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
@@ -55,15 +61,20 @@ func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, e
 	); err != nil {
 		return
 	}
-	if regfont, err = twodee.NewFontFace(font, 32, color.RGBA{0, 0, 0, 200}, bg); err != nil {
+	if regFont, err = twodee.NewFontFace(regFontPath, 32, regFontColor, bg); err != nil {
+		return
+	}
+	if pixelFont, err = twodee.NewFontFace(pixelFontPath, 32, pixelFontColor, bg); err != nil {
 		return
 	}
 	layer = &HudLayer{
 		textCamera:   textCamera,
 		spriteCamera: spriteCamera,
-		regfont:      regfont,
+		regFont:      regFont,
+		pixelFont:    pixelFont,
 		state:        state,
 		app:          app,
+		textCache:    map[string]*twodee.TextCache{},
 	}
 	err = layer.Reset()
 	return
@@ -74,12 +85,24 @@ func (h *HudLayer) Delete() {
 	h.spriteRenderer.Delete()
 }
 
+func (h *HudLayer) cacheText(key string, font *twodee.FontFace, value string) *twodee.Texture {
+	var (
+		ok    bool
+		cache *twodee.TextCache
+	)
+	if cache, ok = h.textCache[key]; !ok {
+		cache = twodee.NewTextCache(font)
+		h.textCache[key] = cache
+	}
+	cache.SetText(value)
+	return cache.Texture
+}
+
 func (h *HudLayer) Render() {
 	hudItems := []string{strconv.Itoa(h.state.Rating), "RATING", strconv.Itoa(h.state.Geld), "GELD"}
 
 	var (
 		configs         = []twodee.SpriteConfig{}
-		textcache       *twodee.TextCache
 		texture         *twodee.Texture
 		xText           = h.textCamera.WorldBounds.Max.X()
 		yText           = h.textCamera.WorldBounds.Max.Y()
@@ -88,19 +111,16 @@ func (h *HudLayer) Render() {
 	)
 
 	h.textRenderer.Bind()
-	textcache = twodee.NewTextCache(h.regfont)
 
 	// Render text for toolbar
-	textcache.SetText("Toolbar")
-	texture = textcache.Texture
+	texture = h.cacheText("toolbar", h.regFont, "Toolbar")
 	if texture != nil {
 		h.textRenderer.Draw(texture, 5, yText-float32(texture.Height))
 	}
 
 	// Render text for 'Geld', <Geld Amount>, 'Rating', <Rating Amount>
 	for i, elem := range hudItems {
-		textcache.SetText(elem)
-		texture = textcache.Texture
+		texture = h.cacheText(fmt.Sprintf("toolbar%v", i), h.regFont, elem)
 		if texture != nil {
 			if i%2 == 0 {
 				xText = xText - (float32(texture.Width) + 10)
@@ -117,8 +137,7 @@ func (h *HudLayer) Render() {
 	for i, block := range blocks {
 		blockCost = block.Cost
 		if blockCost <= h.state.Geld {
-			textcache.SetText(strconv.Itoa(i + 1))
-			texture = textcache.Texture
+			texture = h.cacheText(fmt.Sprintf("key%v", i), h.pixelFont, strconv.Itoa(i+1))
 			if texture != nil {
 				h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*(i+1)))
 			}
