@@ -169,11 +169,11 @@ var (
 			},
 		},
 		Offset:     Ivec2{0, 0},
-		Range:      0.0,
-		MaxTargets: 0,
-		FearPerSec: 0.0,
+		Range:      1.5,
+		MaxTargets: 1,
+		FearPerSec: -2.0,
 		Cost:       50,
-		Title:      "Scary?box",
+		Title:      "Unscarybox",
 	}
 )
 
