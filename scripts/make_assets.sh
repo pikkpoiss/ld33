@@ -38,4 +38,19 @@ TexturePacker \
   tmp
 
 rm -rf tmp
+
+mkdir -p tmp
+cp assets/splash/*.png tmp/
+TexturePacker \
+  --format json-array \
+  --trim-sprite-names \
+  --trim-mode None \
+  --size-constraints POT \
+  --disable-rotation \
+  --data src/resources/splash.json \
+  --sheet src/resources/splash.png \
+  tmp
+
+rm -rf tmp
+
 cd -

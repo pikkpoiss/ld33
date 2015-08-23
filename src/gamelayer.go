@@ -44,6 +44,9 @@ func (l *GameLayer) Delete() {
 }
 
 func (l *GameLayer) Render() {
+	if l.state.SplashState != SplashDisabled {
+		return
+	}
 	l.spriteTexture.Bind()
 	l.gameRenderer.Draw(l.level)
 	l.spriteTexture.Unbind()
@@ -98,6 +101,9 @@ func (l *GameLayer) Reset() (err error) {
 }
 
 func (l *GameLayer) Update(elapsed time.Duration) {
+	if l.state.SplashState != SplashDisabled {
+		return
+	}
 	l.level.Update(elapsed)
 }
 
@@ -105,7 +111,7 @@ func (l *GameLayer) loadSpritesheet() (err error) {
 	var (
 		data []byte
 	)
-	if data, err = ioutil.ReadFile("resources/spriteSheet.json"); err != nil {
+	if data, err = ioutil.ReadFile("resources/spritesheet.json"); err != nil {
 		return
 	}
 	if l.spriteSheet, err = twodee.ParseTexturePackerJSONArrayString(
