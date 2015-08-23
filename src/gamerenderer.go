@@ -93,16 +93,14 @@ func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Ve
 
 func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32, item *GridItem) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
-	if !item.Passable() {
-		frame = sheet.GetFrame("special_squares_00")
-	} else if item.Distance() >= 0 && item.Distance() < 15 {
+	if item.Passable() && item.Distance() >= 0 && item.Distance() < 15 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
 	} else {
 		frame = sheet.GetFrame(item.Frame)
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x + frame.Width / 2.0, y + frame.Height / 2.0, 0,
+			x + frame.Width/2.0, y + frame.Height/2.0, 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},
