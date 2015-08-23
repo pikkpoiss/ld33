@@ -40,7 +40,6 @@ type Mob struct {
 	State          MobState
 	Speed          float32
 	Fear           float64
-	Alive          bool
 	Enabled        bool
 	PendingDisable bool
 	Pos            mgl32.Vec2
@@ -58,8 +57,7 @@ func NewMob(sheet *twodee.Spritesheet) *Mob {
 			twodee.Step10Hz,
 			MobAnimations[Walking|Right],
 		),
-		Fear:  1.0,
-		Alive: true,
+		Fear: 1.0,
 	}
 }
 
@@ -144,9 +142,9 @@ func (m *Mob) setState(state MobState) {
 	}
 }
 
-func (m *Mob) IncreaseFear(fear float64) {
+// IncreaseFear increments the mob's fear counter and returns a bool indicating
+// whether the mob is still alive or has passed away from fright.
+func (m *Mob) IncreaseFear(fear float64) bool {
 	m.Fear += fear
-	if m.Fear > 10 {
-		m.Alive = false
-	}
+	return m.Fear < 10
 }
