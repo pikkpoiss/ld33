@@ -152,7 +152,7 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, block := range l.blocks {
 		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
-		fear := block.FearPerNS * float64(elapsed)
+		fear := block.FearPerSec * elapsed.Seconds()
 		numHit := 0
 		for i := range l.Mobs {
 			if numHit >= block.MaxTargets {
@@ -255,7 +255,7 @@ func (l *Level) disableMob(i int) {
 	l.fearHistory[l.fearIndex] = l.Mobs[i].Fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
 	l.State.Rating = l.calculateRating()
-	l.State.Geld = l.State.Geld + int(math.Floor(l.Mobs[i].Fear*10.0+0.5))
+	l.State.Geld += int(math.Floor(l.Mobs[i].Fear*10.0 + 0.5))
 	l.ActiveMobCount--
 	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
 	l.Mobs[l.ActiveMobCount].Disable()
