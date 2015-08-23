@@ -29,6 +29,9 @@ type State struct {
 }
 
 func NewState() *State {
+	state := &State{}
+	state.Reset()
+	return state
 	return &State{
 		Exit:        false,
 		Geld:        100,
@@ -38,4 +41,14 @@ func NewState() *State {
 		MouseCursor: "mouse_00",
 		SplashState: SplashStart,
 	}
+}
+
+func (s *State) Reset() {
+	s.Exit = false
+	s.Geld = 100
+	s.Rating = 5
+	s.Debug = false
+	s.MousePos = mgl32.Vec2{0, 0}
+	s.MouseCursor = "mouse_00"
+	s.SplashState = SplashStart
 }

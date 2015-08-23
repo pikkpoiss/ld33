@@ -16,7 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
 	"io/ioutil"
 	"time"
 )
@@ -96,20 +95,32 @@ func (l *GameLayer) Reset() (err error) {
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.level, err = NewLevel(l.state, l.spriteSheet, l.app.GameEventHandler); err != nil {
-		return
-	}
-	l.uiState = NewNormalUiState()
-	l.uiState.Register(l.level)
-	if l.gameRenderer, err = NewGameRenderer(l.level, l.spriteSheet); err != nil {
+	if err = l.LoadLevel(); err != nil {
 		return
 	}
 	l.app.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayBackgroundMusic))
 	return
 }
 
+func (l *GameLayer) LoadLevel() (err error) {
+	if l.level, err = NewLevel(l.state, l.spriteSheet, l.app.GameEventHandler); err != nil {
+		return
+	}
+	l.uiState = NewNormalUiState()
+	l.uiState.Register(l.level)
+	if l.gameRenderer != nil {
+		l.gameRenderer.Delete()
+	}
+	if l.gameRenderer, err = NewGameRenderer(l.level, l.spriteSheet); err != nil {
+		return
+	}
+	return
+}
+
 func (l *GameLayer) PlayerLost(e twodee.GETyper) {
-	fmt.Println("Player lost, womp womp!")
+	l.state.Reset()
+	l.state.SplashState = SplashLose
+	l.LoadLevel()
 }
 
 func (l *GameLayer) Update(elapsed time.Duration) {
