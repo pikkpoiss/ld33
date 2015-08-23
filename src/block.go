@@ -16,6 +16,7 @@ package main
 
 import ()
 
+// TODO: Introduce a cooldown for scaring people.
 type Block struct {
 	Template   [][]*GridItem
 	Offset     Ivec2
