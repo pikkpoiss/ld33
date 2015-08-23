@@ -101,6 +101,7 @@ func (m *Mob) Activate(pos mgl32.Vec2, speed float32) {
 func (m *Mob) Disable() {
 	m.Enabled = false
 	m.PendingDisable = false
+	m.Fear = 1.0
 }
 
 func (m *Mob) SpriteConfig(sheet *twodee.Spritesheet) twodee.SpriteConfig {
