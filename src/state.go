@@ -23,7 +23,7 @@ type State struct {
 func NewState() *State {
 	return &State{
 		Exit:   false,
-		Geld:   0,
+		Geld:   100,
 		Rating: 5,
 	}
 }

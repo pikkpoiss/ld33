@@ -113,11 +113,22 @@ func (h *HudLayer) Render() {
 	}
 
 	// Render text for each of the available blocks to purchase
-	for i := 1; i < 4; i++ {
-		textcache.SetText(strconv.Itoa(i))
-		texture = textcache.Texture
-		if texture != nil {
-			h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*i))
+	blockCost := 0
+	for i := 1; i < 3; i++ {
+		switch i {
+		case 1:
+			blockCost = OneBlock.Cost
+		case 2:
+			blockCost = ThreeBlock.Cost
+		default:
+			blockCost = 0
+		}
+		if blockCost <= h.state.Geld {
+			textcache.SetText(strconv.Itoa(i))
+			texture = textcache.Texture
+			if texture != nil {
+				h.textRenderer.Draw(texture, 5, yText-float32(verticalSpacing*i))
+			}
 		}
 	}
 
@@ -125,8 +136,20 @@ func (h *HudLayer) Render() {
 
 	// Render toolbar for selecting blocks to place
 	h.spriteTexture.Bind()
-	for blockNum = 0; blockNum < 3; blockNum++ {
-		configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, blockNum, ySprite))
+	for blockNum = 0; blockNum < 2; blockNum++ {
+		switch blockNum {
+		case 0:
+			blockCost = OneBlock.Cost
+		case 1:
+			blockCost = ThreeBlock.Cost
+		default:
+			blockCost = 0
+		}
+		if blockCost <= h.state.Geld {
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, blockNum, ySprite))
+		} else {
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, ySprite))
+		}
 	}
 	h.spriteRenderer.Draw(configs)
 	h.spriteTexture.Unbind()
