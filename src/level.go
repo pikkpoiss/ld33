@@ -17,6 +17,7 @@ package main
 import (
 	"../lib/twodee"
 	"github.com/go-gl/mathgl/mgl32"
+	"math"
 	"time"
 )
 
@@ -63,7 +64,7 @@ type Level struct {
 	entries        []SpawnZone
 	exit           SpawnZone
 	blocks         map[Ivec2]*Block
-	fearHistory    []int
+	fearHistory    []float64
 	fearIndex      int
 }
 
@@ -82,7 +83,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 			NewSpawnZone(Ivec2{4, 4}),
 		}
 		exit        = NewSpawnZone(Ivec2{20, 10})
-		fearHistory = make([]int, 100)
+		fearHistory = make([]float64, 100)
 	)
 	if grid, err = NewGrid(); err != nil {
 		return
@@ -151,7 +152,7 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, block := range l.blocks {
 		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
-		fear := block.FearPerNS * int(elapsed)
+		fear := block.FearPerNS * float64(elapsed)
 		numHit := 0
 		for i := range l.Mobs {
 			if numHit >= block.MaxTargets {
@@ -200,13 +201,16 @@ func (l *Level) SetBlock(pos mgl32.Vec2, block *Block) {
 	}
 }
 
-func (l *Level) calculateRating() (newRating int) {
-	newRating = 0
-	for i := 0; i < 100; i++ {
-		newRating = newRating + l.fearHistory[i]
+// calculateRating returns the rounded integer average of all values in
+// fearHistory.
+// TODO: The rating should probably be cached and recalculated when mobs
+// despawn, as opposed to generated anew each time like this...
+func (l *Level) calculateRating() int {
+	sum := 0.0
+	for _, v := range l.fearHistory {
+		sum += v
 	}
-	newRating = newRating / 100
-	return
+	return int(math.Floor(sum/float64(len(l.fearHistory)) + 0.5))
 }
 
 func (l *Level) ClearHighlights() {
@@ -249,13 +253,9 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 
 func (l *Level) disableMob(i int) {
 	l.fearHistory[l.fearIndex] = l.Mobs[i].Fear
-	if l.fearIndex == 99 {
-		l.fearIndex = 0
-	} else {
-		l.fearIndex++
-	}
+	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
 	l.State.Rating = l.calculateRating()
-	l.State.Geld = l.State.Geld + (l.Mobs[i].Fear * 10)
+	l.State.Geld = l.State.Geld + int(math.Floor(l.Mobs[i].Fear*10.0+0.5))
 	l.ActiveMobCount--
 	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
 	l.Mobs[l.ActiveMobCount].Disable()
