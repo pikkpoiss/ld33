@@ -41,25 +41,29 @@ type Grid struct {
 	sink        Ivec2
 }
 
-func NewGrid() (g *Grid) {
-	g = &Grid{
-		grid:        twodee.NewGrid(GridWidth, GridHeight, 1.0),
-		defaultItem: &GridItem{true, 0},
+func NewGrid() (g *Grid, err error) {
+	var (
+		grid *twodee.Grid
+	)
+	if grid, err = LoadTiledMap("resources/maps/map01.tmx"); err != nil {
+		return
 	}
-	//	g.AddSource(Ivec2{4, 19})
-	//	g.SetSink(Ivec2{40, 20})
+	g = &Grid{
+		grid:        grid,
+		defaultItem: &GridItem{true, 0, "tiles_00"},
+	}
 	g.init()
 	g.CalculateDistances()
 	return
 }
 
 func (g *Grid) AddSource(pt Ivec2) {
-	g.Set(pt, &GridItem{false, 0})
+	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
 	g.sources = append(g.sources, pt)
 }
 
 func (g *Grid) SetSink(pt Ivec2) {
-	g.Set(pt, &GridItem{false, 0})
+	g.Set(pt, &GridItem{false, 0, "special_squares_00"})
 	g.sink = pt
 }
 
@@ -149,20 +153,22 @@ func (g *Grid) GetNextStepToSink(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, val
 }
 
 func (g *Grid) init() {
-	var (
-		x    int32
-		y    int32
-		item *GridItem
-		pt   Ivec2
-	)
-	for x = 0; x < g.Width(); x++ {
-		for y = 0; y < g.Height(); y++ {
-			pt = Ivec2{x, y}
-			if item = g.get(pt); item == nil {
-				g.Set(pt, &GridItem{true, -1})
+	/*
+		var (
+			x    int32
+			y    int32
+			item *GridItem
+			pt   Ivec2
+		)
+		for x = 0; x < g.Width(); x++ {
+			for y = 0; y < g.Height(); y++ {
+				pt = Ivec2{x, y}
+				if item = g.get(pt); item == nil {
+					g.Set(pt, &GridItem{true, -1})
+				}
 			}
 		}
-	}
+	*/
 }
 
 func (g *Grid) resetDistances() {

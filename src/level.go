@@ -61,27 +61,29 @@ const (
 	MaxMobs = 200
 )
 
-func NewLevel() (level *Level, err error) {
+func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
 		mobs    = make([]Mob, MaxMobs)
-		grid    = NewGrid()
+		grid    *Grid
 		camera  *twodee.Camera
 		entries = []SpawnZone{
-			NewSpawnZone(Ivec2{4, 19}),
-			NewSpawnZone(Ivec2{4, 35}),
-			NewSpawnZone(Ivec2{4, 5}),
+			NewSpawnZone(Ivec2{4, 9}),
+			NewSpawnZone(Ivec2{4, 14}),
+			NewSpawnZone(Ivec2{4, 4}),
 		}
-		exit = NewSpawnZone(Ivec2{40, 20})
+		exit = NewSpawnZone(Ivec2{20, 10})
 	)
 	for _, entry := range entries {
 		grid.AddSource(entry.Pos)
 	}
 	grid.SetSink(exit.Pos)
 
-	//	for i := 0; i < MaxMobs; i++ {
-	//		mobs[i] = &Mob{}
-	//	}
-	//	grid = NewGrid()
+	for i := 0; i < MaxMobs; i++ {
+		mobs[i] = *NewMob(sheet)
+	}
+	if grid, err = NewGrid(); err != nil {
+		return
+	}
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),

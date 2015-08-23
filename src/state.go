@@ -16,12 +16,14 @@ package main
 
 type State struct {
 	Exit  bool
-	Debug bool
+	Geld int
+  Rating int
 }
 
 func NewState() *State {
 	return &State{
-		Exit:  false,
-		Debug: false,
+		Exit:   false,
+		Geld:   0,
+		Rating: 0,
 	}
 }

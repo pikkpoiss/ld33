@@ -20,10 +20,6 @@ import (
 	"time"
 )
 
-const (
-	PxPerUnit = 32
-)
-
 type GameLayer struct {
 	gameRenderer  *GameRenderer
 	spriteSheet   *twodee.Spritesheet
@@ -34,19 +30,8 @@ type GameLayer struct {
 }
 
 func NewGameLayer(app *Application) (layer *GameLayer, err error) {
-	var (
-		level   *Level
-		uiState UiState
-	)
-	if level, err = NewLevel(); err != nil {
-		return
-	}
-	uiState = NewNormalUiState()
-	uiState.Register(level)
 	layer = &GameLayer{
-		app:     app,
-		level:   level,
-		uiState: uiState,
+		app: app,
 	}
 	err = layer.Reset()
 	return
@@ -90,6 +75,11 @@ func (l *GameLayer) Reset() (err error) {
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
+	if l.level, err = NewLevel(l.spriteSheet); err != nil {
+		return
+	}
+	l.uiState = NewNormalUiState()
+	l.uiState.Register(l.level)
 	if l.gameRenderer, err = NewGameRenderer(l.level, l.spriteSheet); err != nil {
 		return
 	}

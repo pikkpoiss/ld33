@@ -1,6 +1,78 @@
 {"frames": [
 
 {
+	"filename": "human01_00",
+	"frame": {"x":104,"y":2,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_01",
+	"frame": {"x":104,"y":36,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_02",
+	"frame": {"x":104,"y":70,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_03",
+	"frame": {"x":104,"y":104,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_04",
+	"frame": {"x":104,"y":138,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_05",
+	"frame": {"x":36,"y":206,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_06",
+	"frame": {"x":54,"y":206,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "human01_07",
+	"frame": {"x":70,"y":172,"w":16,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":32},
+	"sourceSize": {"w":16,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
 	"filename": "numbered_squares_00",
 	"frame": {"x":2,"y":2,"w":32,"h":32},
 	"rotated": false,
@@ -287,6 +359,15 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
 	"sourceSize": {"w":32,"h":32},
 	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "tiles_00",
+	"frame": {"x":88,"y":172,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16},
+	"pivot": {"x":0.5,"y":0.5}
 }],
 "meta": {
 	"app": "http://www.codeandweb.com/texturepacker",
@@ -295,6 +376,6 @@
 	"format": "RGBA8888",
 	"size": {"w":128,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:066c805564739229183cc13b4f8e5297:b229efb9f3a4d37e959d286211d90e7d:729adc6043343cfda41c447ce8f464d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:fc29fe87289800ebe37eed11bcff32e7:5f39a86ffa70d367526ac0ed344d0607:729adc6043343cfda41c447ce8f464d6$"
 }
 }

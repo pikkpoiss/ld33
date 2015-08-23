@@ -21,26 +21,31 @@ import (
 )
 
 type GameRenderer struct {
-	sheet  *twodee.Spritesheet
-	sprite *twodee.SpriteRenderer
+	sheet   *twodee.Spritesheet
+	sprite  *twodee.SpriteRenderer
+	effects *EffectsRenderer
 }
 
 func NewGameRenderer(level *Level, sheet *twodee.Spritesheet) (renderer *GameRenderer, err error) {
 	var (
-		sprite *twodee.SpriteRenderer
+		xsize = int(PxPerUnit) * int(level.Grid.Width())
+		ysize = int(PxPerUnit) * int(level.Grid.Height())
 	)
-	if sprite, err = twodee.NewSpriteRenderer(level.Camera); err != nil {
+	renderer = &GameRenderer{
+		sheet: sheet,
+	}
+	if renderer.sprite, err = twodee.NewSpriteRenderer(level.Camera); err != nil {
 		return
 	}
-	renderer = &GameRenderer{
-		sprite: sprite,
-		sheet:  sheet,
+	if renderer.effects, err = NewEffectsRenderer(xsize, ysize); err != nil {
+		return
 	}
 	return
 }
 
 func (r *GameRenderer) Delete() {
 	r.sprite.Delete()
+	r.effects.Delete()
 }
 
 func (r *GameRenderer) Draw(level *Level) {
@@ -65,30 +70,17 @@ func (r *GameRenderer) Draw(level *Level) {
 		if !mob.Enabled { // No enabled mobs after first disabled mob.
 			break
 		}
-		configs = append(configs, r.mobSpriteConfig(
-			r.sheet,
-			mob.Pos,
-			&mob,
-		))
+		configs = append(configs, mob.SpriteConfig(r.sheet))
 	}
 	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
+	r.effects.Bind()
 	r.sprite.Draw(configs)
+	r.effects.Unbind()
+	r.effects.Draw()
 }
 
 func (r *GameRenderer) cursorSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, cursor string) twodee.SpriteConfig {
 	frame := sheet.GetFrame(cursor)
-	return twodee.SpriteConfig{
-		View: twodee.ModelViewConfig{
-			pt.X(), pt.Y(), 0,
-			0, 0, 0,
-			1.0, 1.0, 1.0,
-		},
-		Frame: frame.Frame,
-	}
-}
-
-func (r *GameRenderer) mobSpriteConfig(sheet *twodee.Spritesheet, pt mgl32.Vec2, mob *Mob) twodee.SpriteConfig {
-	frame := sheet.GetFrame("special_squares_01")
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
 			pt.X(), pt.Y(), 0,
@@ -106,11 +98,11 @@ func (r *GameRenderer) gridSpriteConfig(sheet *twodee.Spritesheet, x, y float32,
 	} else if item.Distance() >= 0 && item.Distance() < 15 {
 		frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", item.Distance()))
 	} else {
-		frame = sheet.GetFrame("numbered_squares_14")
+		frame = sheet.GetFrame(item.Frame)
 	}
 	return twodee.SpriteConfig{
 		View: twodee.ModelViewConfig{
-			x + 0.5, y + 0.5, 0,
+			x + frame.Width/2.0, y + frame.Height/2.0, 0,
 			0, 0, 0,
 			1.0, 1.0, 1.0,
 		},

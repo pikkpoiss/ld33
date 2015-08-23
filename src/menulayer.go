@@ -64,7 +64,6 @@ func NewMenuLayer(winb twodee.Rectangle, state *State, app *Application) (layer 
 	}
 	menu, err = twodee.NewMenu([]twodee.MenuItem{
 		twodee.NewKeyValueMenuItem("Exit", ProgramCode, ExitCode),
-		twodee.NewKeyValueMenuItem("Debug", ProgramCode, DebugCode),
 	})
 	if err != nil {
 		return
@@ -227,9 +226,6 @@ func (ml *MenuLayer) handleMenuItem(data *twodee.MenuItemData) {
 		switch data.Value {
 		case ExitCode:
 			ml.state.Exit = true
-		case DebugCode:
-			ml.state.Debug = !ml.state.Debug
-			ml.visible = false
 		}
 	default:
 		fmt.Printf("Menu entry selection: %v\n", data)
