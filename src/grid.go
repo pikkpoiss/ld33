@@ -35,22 +35,24 @@ func (i Ivec2) Plus(a Ivec2) Ivec2 {
 }
 
 type Grid struct {
-	grid        *twodee.Grid
-	defaultItem *GridItem
-	sources     []Ivec2
-	sink        Ivec2
+	background *twodee.Grid
+	grid       *twodee.Grid
+	sources    []Ivec2
+	sink       Ivec2
 }
 
 func NewGrid() (g *Grid, err error) {
 	var (
-		grid *twodee.Grid
+		background *twodee.Grid
+		grid       *twodee.Grid
 	)
-	if grid, err = LoadTiledMap("resources/maps/map01.tmx"); err != nil {
+	if background, err = LoadTiledMap("resources/maps/map01.tmx"); err != nil {
 		return
 	}
+	grid = twodee.NewGrid(background.Width, background.Height, 1.0)
 	g = &Grid{
-		grid:        grid,
-		defaultItem: &GridItem{true, 0, "tiles_00"},
+		background: background,
+		grid:       grid,
 	}
 	return
 }
@@ -65,14 +67,6 @@ func (g *Grid) SetSink(pt Ivec2) {
 	g.sink = pt
 }
 
-func (g *Grid) Get(pt Ivec2) (item *GridItem) {
-	item = g.get(pt)
-	if item == nil {
-		return g.defaultItem
-	}
-	return item
-}
-
 func (g *Grid) Set(pt Ivec2, item *GridItem) {
 	g.grid.Set(pt.X(), pt.Y(), item)
 }
@@ -85,7 +79,7 @@ func (g *Grid) IsBlockValid(origin Ivec2, block *Block) (ok bool) {
 	ok = true
 	for y := 0; y < len(block.Template); y++ {
 		for x := 0; x < len(block.Template[y]); x++ {
-			item = g.get(pt.Plus(Ivec2{int32(x), int32(y)}))
+			item = g.Get(pt.Plus(Ivec2{int32(x), int32(y)}))
 			if item != nil && !item.Passable() {
 				fmt.Printf("Invalid! %v\n", item)
 				ok = false
@@ -136,7 +130,11 @@ func (g *Grid) GetNextStepToSink(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, val
 	points = g.getAdjacent(gridPt)
 	valid = false
 	for _, adj := range points {
-		if item = g.get(adj); item != nil && item.Passable() {
+		item = g.Get(adj)
+		if item == nil {
+			item = g.GetBg(adj)
+		}
+		if item != nil && item.Passable() {
 			if item.Distance() < dist {
 				dist = item.Distance()
 				out = mgl32.Vec2{
@@ -160,7 +158,11 @@ func (g *Grid) resetDistances() {
 	for x = 0; x < g.Width(); x++ {
 		for y = 0; y < g.Height(); y++ {
 			pt = Ivec2{x, y}
-			if item = g.get(pt); item != nil && item.Passable() {
+			item = g.Get(pt)
+			if item == nil {
+				item = g.GetBg(pt)
+			}
+			if item != nil && item.Passable() {
 				item.SetDistance(-1)
 			}
 		}
@@ -178,10 +180,16 @@ func (g *Grid) CalculateDistances() {
 		pt := queue[0]
 		queue = queue[1:]
 		points := g.getAdjacent(pt)
-		item = g.get(pt)
+		item = g.Get(pt)
+		if item == nil {
+			item = g.GetBg(pt)
+		}
 		dist = item.Distance() + 1
 		for _, adj := range points {
-			item = g.get(adj)
+			item = g.Get(adj)
+			if item == nil {
+				item = g.GetBg(adj)
+			}
 			if item != nil && item.Distance() == -1 && item.Passable() {
 				queue = append(queue, adj)
 				item.SetDistance(dist)
@@ -190,12 +198,24 @@ func (g *Grid) CalculateDistances() {
 	}
 }
 
-func (g *Grid) get(pt Ivec2) (item *GridItem) {
+func (g *Grid) Get(pt Ivec2) (item *GridItem) {
 	var (
 		tditem twodee.GridItem
 		ok     bool
 	)
 	tditem = g.grid.Get(pt[0], pt[1])
+	if item, ok = tditem.(*GridItem); ok {
+		return item
+	}
+	return nil
+}
+
+func (g *Grid) GetBg(pt Ivec2) (item *GridItem) {
+	var (
+		tditem twodee.GridItem
+		ok     bool
+	)
+	tditem = g.background.Get(pt[0], pt[1])
 	if item, ok = tditem.(*GridItem); ok {
 		return item
 	}
