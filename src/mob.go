@@ -39,7 +39,7 @@ func (m *Mob) moveTowardExit(elapsed time.Duration, level *Level) {
 		goalDist int32
 		stepDist = pct * m.Speed
 	)
-	if dest, goalDist, ok = level.Grid.GetNextStepToExit(m.Pos); !ok {
+	if dest, goalDist, ok = level.Grid.GetNextStepToSink(m.Pos); !ok {
 		return
 	}
 	gridDist = dest.Sub(m.Pos)

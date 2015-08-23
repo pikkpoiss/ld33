@@ -68,7 +68,7 @@ func (r *GameRenderer) Draw(level *Level) {
 		configs = append(configs, r.mobSpriteConfig(
 			r.sheet,
 			mob.Pos,
-			mob,
+			&mob,
 		))
 	}
 	configs = append(configs, r.cursorSpriteConfig(r.sheet, level.GetMouse(), level.GetCursor()))
