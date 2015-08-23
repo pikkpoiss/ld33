@@ -15,12 +15,12 @@
 package main
 
 import (
-  "../lib/twodee"
-  "time"
+	"../lib/twodee"
+	"time"
 )
 
 const (
-  MR_BONES_EFFECT_DURATION float64 = 2
+	MR_BONES_EFFECT_DURATION float64 = 2
 )
 
 type AudioSystem struct {
@@ -36,7 +36,7 @@ type AudioSystem struct {
 	mrbonesEffectObserverId    int
 	deathEffectObserverId      int
 	musicToggle                int32
-	mrbonesLastPlayed time.Time
+	mrbonesLastPlayed          time.Time
 }
 
 func (a *AudioSystem) PlayBackgroundMusic(e twodee.GETyper) {
@@ -71,7 +71,7 @@ func (a *AudioSystem) PlayPlaceBlockEffect(e twodee.GETyper) {
 }
 
 func (a *AudioSystem) PlayMrBonesEffect(e twodee.GETyper) {
-	if (time.Since(a.mrbonesLastPlayed).Seconds() > MR_BONES_EFFECT_DURATION) {
+	if time.Since(a.mrbonesLastPlayed).Seconds() > MR_BONES_EFFECT_DURATION {
 		a.mrbonesEffect.PlayChannel(3, 1)
 		a.mrbonesLastPlayed = time.Now()
 	}
@@ -123,12 +123,12 @@ func NewAudioSystem(app *Application) (audioSystem *AudioSystem, err error) {
 	mrbonesLastPlayed := time.Now()
 
 	audioSystem = &AudioSystem{
-		app:              app,
-		bgm:              bgm,
-		placeBlockEffect: placeBlockEffect,
-		mrbonesEffect:    mrbonesEffect,
-		deathEffect:      deathEffect,
-		musicToggle:      1,
+		app:               app,
+		bgm:               bgm,
+		placeBlockEffect:  placeBlockEffect,
+		mrbonesEffect:     mrbonesEffect,
+		deathEffect:       deathEffect,
+		musicToggle:       1,
 		mrbonesLastPlayed: mrbonesLastPlayed,
 	}
 	audioSystem.bgmObserverId = app.GameEventHandler.AddObserver(PlayBackgroundMusic, audioSystem.PlayBackgroundMusic)

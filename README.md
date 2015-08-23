@@ -19,6 +19,8 @@
 - [x] Mobs yield gold upon despawn
 - [x] "Star rating" review system
 - [] Mobs must be scared within "an inch of their life"
+- [] Lose state
+- [] Win state
 
 ### Stretch?
 - [] Mobs avoid congested zones

@@ -22,6 +22,7 @@ build_aesprite ghost01
 build_aesprite spikes01
 build_aesprite bubble
 build_aesprite mouse
+build_aesprite gate
 build_aesprite tiles
 build_aesprite tiles "assets/tiled"
 cp assets/*.png tmp/
@@ -37,4 +38,19 @@ TexturePacker \
   tmp
 
 rm -rf tmp
+
+mkdir -p tmp
+cp assets/splash/*.png tmp/
+TexturePacker \
+  --format json-array \
+  --trim-sprite-names \
+  --trim-mode None \
+  --size-constraints POT \
+  --disable-rotation \
+  --data src/resources/splash.json \
+  --sheet src/resources/splash.png \
+  tmp
+
+rm -rf tmp
+
 cd -

@@ -1,0 +1,39 @@
+{"frames": [
+
+{
+	"filename": "lose.fw",
+	"frame": {"x":2,"y":2,"w":512,"h":320},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":320},
+	"sourceSize": {"w":512,"h":320},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "start.fw",
+	"frame": {"x":2,"y":324,"w":512,"h":320},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":320},
+	"sourceSize": {"w":512,"h":320},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "win.fw",
+	"frame": {"x":2,"y":646,"w":512,"h":320},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":320},
+	"sourceSize": {"w":512,"h":320},
+	"pivot": {"x":0.5,"y":0.5}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "splash.png",
+	"format": "RGBA8888",
+	"size": {"w":1024,"h":1024},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:f209f27ef0780b67d8ba5dc5b4689803:44389713eee9e62199b545feb4c4622f:17912d807795a397b5ccd2ab39a16cd0$"
+}
+}

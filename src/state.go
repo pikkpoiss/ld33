@@ -25,6 +25,7 @@ type State struct {
 	Debug       bool
 	MousePos    mgl32.Vec2
 	MouseCursor string
+	SplashState SplashState
 }
 
 func NewState() *State {
@@ -35,5 +36,6 @@ func NewState() *State {
 		Debug:       false,
 		MousePos:    mgl32.Vec2{0, 0},
 		MouseCursor: "mouse_00",
+		SplashState: SplashStart,
 	}
 }

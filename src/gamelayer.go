@@ -16,18 +16,20 @@ package main
 
 import (
 	"../lib/twodee"
+	"fmt"
 	"io/ioutil"
 	"time"
 )
 
 type GameLayer struct {
-	gameRenderer  *GameRenderer
-	spriteSheet   *twodee.Spritesheet
-	spriteTexture *twodee.Texture
-	app           *Application
-	level         *Level
-	uiState       UiState
-	state         *State
+	gameRenderer         *GameRenderer
+	spriteSheet          *twodee.Spritesheet
+	spriteTexture        *twodee.Texture
+	app                  *Application
+	level                *Level
+	uiState              UiState
+	state                *State
+	playerLostObserverId int
 }
 
 func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) {
@@ -35,15 +37,24 @@ func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) 
 		app:   app,
 		state: state,
 	}
+	layer.playerLostObserverId = app.GameEventHandler.AddObserver(PlayerLost, layer.PlayerLost)
 	err = layer.Reset()
 	return
 }
 
 func (l *GameLayer) Delete() {
+	if l.playerLostObserverId != 0 {
+		l.app.GameEventHandler.RemoveObserver(
+			PlayerLost, l.playerLostObserverId)
+		l.playerLostObserverId = 0
+	}
 	l.gameRenderer.Delete()
 }
 
 func (l *GameLayer) Render() {
+	if l.state.SplashState != SplashDisabled {
+		return
+	}
 	l.spriteTexture.Bind()
 	l.gameRenderer.Draw(l.level)
 	l.spriteTexture.Unbind()
@@ -85,7 +96,7 @@ func (l *GameLayer) Reset() (err error) {
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.level, err = NewLevel(l.app, l.state, l.spriteSheet); err != nil {
+	if l.level, err = NewLevel(l.state, l.spriteSheet, l.app.GameEventHandler); err != nil {
 		return
 	}
 	l.uiState = NewNormalUiState()
@@ -97,7 +108,14 @@ func (l *GameLayer) Reset() (err error) {
 	return
 }
 
+func (l *GameLayer) PlayerLost(e twodee.GETyper) {
+	fmt.Println("Player lost, womp womp!")
+}
+
 func (l *GameLayer) Update(elapsed time.Duration) {
+	if l.state.SplashState != SplashDisabled {
+		return
+	}
 	l.level.Update(elapsed)
 }
 
@@ -105,7 +123,7 @@ func (l *GameLayer) loadSpritesheet() (err error) {
 	var (
 		data []byte
 	)
-	if data, err = ioutil.ReadFile("resources/spriteSheet.json"); err != nil {
+	if data, err = ioutil.ReadFile("resources/spritesheet.json"); err != nil {
 		return
 	}
 	if l.spriteSheet, err = twodee.ParseTexturePackerJSONArrayString(

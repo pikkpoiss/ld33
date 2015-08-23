@@ -25,6 +25,7 @@ const (
 	PlayPlaceBlockEffect
 	PlayMrBonesEffect
 	PlayDeathEffect
+	PlayerLost
 	SENTINEL
 )
 

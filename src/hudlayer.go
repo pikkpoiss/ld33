@@ -61,7 +61,6 @@ func NewHudLayer(state *State, grid *Grid, app *Application) (layer *HudLayer, e
 	)
 	if camera, err = twodee.NewCamera(
 		twodee.Rect(0, 0, float32(grid.Width()), float32(grid.Height())),
-		//twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 		twodee.Rect(0, 0, ScreenWidth, ScreenHeight),
 	); err != nil {
 		return
@@ -103,23 +102,7 @@ func (h *HudLayer) cacheText(key string, font *twodee.FontFace, value string) *t
 	return cache.Texture
 }
 
-func (h *HudLayer) Render() {
-	hudItems := []string{strconv.Itoa(h.state.Rating), "RATING", strconv.Itoa(h.state.Geld), "GELD"}
-
-	var (
-		configs   = []twodee.SpriteConfig{}
-		texture   *twodee.Texture
-		xText     = h.camera.WorldBounds.Max.X()
-		yText     = h.camera.WorldBounds.Max.Y()
-		texHeight float32
-		texWidth  float32
-		//ySprite         = h.spriteCamera.WorldBounds.Max.Y()
-		//verticalSpacing = 80
-	)
-
-	// Render toolbar for selecting blocks to place
-	h.spriteTexture.Bind()
-
+func (h *HudLayer) renderToolbarItems(configs []twodee.SpriteConfig) []twodee.SpriteConfig {
 	for _, item := range h.items {
 		x := item.HitBox.Max.X()
 		y := item.HitBox.Min.Y()
@@ -133,19 +116,31 @@ func (h *HudLayer) Render() {
 			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, y))
 		}
 	}
+	return configs
+}
 
+func (h *HudLayer) renderCursor(configs []twodee.SpriteConfig) []twodee.SpriteConfig {
 	configs = append(
 		configs,
 		h.cursorSpriteConfig(h.spriteSheet, h.state.MousePos, h.state.MouseCursor),
 	)
+	return configs
+}
 
-	if len(configs) > 0 {
-		h.spriteRenderer.Draw(configs)
-	}
-	h.spriteTexture.Unbind()
-
-	// Put text on top
-
+func (h *HudLayer) renderText() {
+	var (
+		texture   *twodee.Texture
+		xText     = h.camera.WorldBounds.Max.X()
+		yText     = h.camera.WorldBounds.Max.Y()
+		texHeight float32
+		texWidth  float32
+		hudItems  = []string{
+			strconv.Itoa(h.state.Rating),
+			"RATING",
+			strconv.Itoa(h.state.Geld),
+			"GELD",
+		}
+	)
 	h.textRenderer.Bind()
 
 	// Render text for toolbar
@@ -181,6 +176,26 @@ func (h *HudLayer) Render() {
 	}
 
 	h.textRenderer.Unbind()
+}
+
+func (h *HudLayer) Render() {
+	var configs = []twodee.SpriteConfig{}
+
+	// Render toolbar for selecting blocks to place
+	h.spriteTexture.Bind()
+	if h.state.SplashState == SplashDisabled {
+		configs = h.renderToolbarItems(configs)
+	}
+	configs = h.renderCursor(configs)
+	if len(configs) > 0 {
+		h.spriteRenderer.Draw(configs)
+	}
+	h.spriteTexture.Unbind()
+
+	// Put text on top
+	if h.state.SplashState == SplashDisabled {
+		h.renderText()
+	}
 }
 
 func (h *HudLayer) HandleEvent(evt twodee.Event) bool {
