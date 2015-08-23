@@ -80,6 +80,7 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 		grid.AddSource(entry.Pos)
 	}
 	grid.SetSink(exit.Pos)
+	grid.CalculateDistances()
 
 	for i := 0; i < MaxMobs; i++ {
 		mobs[i] = *NewMob(sheet)

@@ -52,8 +52,6 @@ func NewGrid() (g *Grid, err error) {
 		grid:        grid,
 		defaultItem: &GridItem{true, 0, "tiles_00"},
 	}
-	g.init()
-	g.CalculateDistances()
 	return
 }
 
@@ -150,25 +148,6 @@ func (g *Grid) GetNextStepToSink(pt mgl32.Vec2) (out mgl32.Vec2, dist int32, val
 		}
 	}
 	return
-}
-
-func (g *Grid) init() {
-	/*
-		var (
-			x    int32
-			y    int32
-			item *GridItem
-			pt   Ivec2
-		)
-		for x = 0; x < g.Width(); x++ {
-			for y = 0; y < g.Height(); y++ {
-				pt = Ivec2{x, y}
-				if item = g.get(pt); item == nil {
-					g.Set(pt, &GridItem{true, -1})
-				}
-			}
-		}
-	*/
 }
 
 func (g *Grid) resetDistances() {
