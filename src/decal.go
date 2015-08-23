@@ -36,13 +36,13 @@ func NewDecal() *Decal {
 	}
 }
 
-func (d *Decal) Activate(pos mgl32.Vec2, frame string, duration time.Duration) {
+func (d *Decal) Activate(pos mgl32.Vec2, frame string, move float32, duration time.Duration) {
 	d.Pos = pos
 	d.Frame = frame
 	d.Adjust = 0
 	d.Enabled = true
 	d.PendingDisable = false
-	d.Animation = twodee.NewEaseOutAnimation(&d.Adjust, 0, 1, duration)
+	d.Animation = twodee.NewEaseOutAnimation(&d.Adjust, 0, move, duration)
 	d.Animation.SetCallback(func() {
 		d.PendingDisable = true
 	})

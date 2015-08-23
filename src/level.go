@@ -192,6 +192,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 					// Mob has been scared to death.
 					// TODO: uhhh this should be prettier.
 					killed = append(killed, i)
+					l.AddDecal(mob.Pos.Add(mgl32.Vec2{0,0.5}), "ghost01_00", 2, 2 * time.Second)
 				}
 			}
 		}
@@ -302,9 +303,9 @@ func (l *Level) despawnMob(i int) {
 	var fear = l.Mobs[i].Fear
 	switch {
 	case fear < 5:
-		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_00")
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_00", 1, 500 * time.Millisecond)
 	case fear > 8:
-		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_01")
+		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_01", 1, 500 * time.Millisecond)
 	}
 	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
@@ -319,11 +320,11 @@ func (l *Level) disableMob(i int) {
 	l.Mobs[l.ActiveMobCount].Disable()
 }
 
-func (l *Level) AddDecal(pos mgl32.Vec2, frame string) {
+func (l *Level) AddDecal(pos mgl32.Vec2, frame string, move float32, duration time.Duration) {
 	if l.ActiveDecalCount >= MaxDecals {
 		return
 	}
-	l.Decals[l.ActiveDecalCount].Activate(pos, frame, 500*time.Millisecond)
+	l.Decals[l.ActiveDecalCount].Activate(pos, frame, move, duration)
 	l.ActiveDecalCount++
 }
 
