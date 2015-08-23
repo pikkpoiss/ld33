@@ -16,18 +16,20 @@ package main
 
 import (
 	"../lib/twodee"
+	"fmt"
 	"io/ioutil"
 	"time"
 )
 
 type GameLayer struct {
-	gameRenderer  *GameRenderer
-	spriteSheet   *twodee.Spritesheet
-	spriteTexture *twodee.Texture
-	app           *Application
-	level         *Level
-	uiState       UiState
-	state         *State
+	gameRenderer         *GameRenderer
+	spriteSheet          *twodee.Spritesheet
+	spriteTexture        *twodee.Texture
+	app                  *Application
+	level                *Level
+	uiState              UiState
+	state                *State
+	playerLostObserverId int
 }
 
 func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) {
@@ -35,11 +37,17 @@ func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) 
 		app:   app,
 		state: state,
 	}
+	layer.playerLostObserverId = app.GameEventHandler.AddObserver(PlayerLost, layer.PlayerLost)
 	err = layer.Reset()
 	return
 }
 
 func (l *GameLayer) Delete() {
+	if l.playerLostObserverId != 0 {
+		l.app.GameEventHandler.RemoveObserver(
+			PlayerLost, l.playerLostObserverId)
+		l.playerLostObserverId = 0
+	}
 	l.gameRenderer.Delete()
 }
 
@@ -88,7 +96,7 @@ func (l *GameLayer) Reset() (err error) {
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.level, err = NewLevel(l.state, l.spriteSheet); err != nil {
+	if l.level, err = NewLevel(l.state, l.spriteSheet, l.app.GameEventHandler); err != nil {
 		return
 	}
 	l.uiState = NewNormalUiState()
@@ -98,6 +106,10 @@ func (l *GameLayer) Reset() (err error) {
 	}
 	l.app.GameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayBackgroundMusic))
 	return
+}
+
+func (l *GameLayer) PlayerLost(e twodee.GETyper) {
+	fmt.Println("Player lost, womp womp!")
 }
 
 func (l *GameLayer) Update(elapsed time.Duration) {

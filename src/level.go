@@ -22,6 +22,10 @@ import (
 	"time"
 )
 
+const (
+	FAIL_RATING = 0
+)
+
 type SpawnZone struct {
 	Pos    Ivec2
 	charge float64
@@ -68,6 +72,7 @@ type Level struct {
 	fearHistory      []float64
 	fearIndex        int
 	highlighted      *BlockPlacement
+	gameEventHandler *twodee.GameEventHandler
 }
 
 const (
@@ -75,7 +80,7 @@ const (
 	MaxDecals = 10
 )
 
-func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error) {
+func NewLevel(state *State, sheet *twodee.Spritesheet, gameEventHandler *twodee.GameEventHandler) (level *Level, err error) {
 	var (
 		mobs    = make([]Mob, MaxMobs)
 		decals  = make([]*Decal, MaxDecals)
@@ -128,6 +133,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error)
 		blocks:           make(map[Ivec2]BlockPlacement),
 		fearHistory:      fearHistory,
 		fearIndex:        0,
+		gameEventHandler: gameEventHandler,
 	}
 	return
 }
@@ -205,6 +211,14 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 	}
 }
 
+// checkConditions checks to see if the player has lost. If so, it enqueues a
+// PlayerLost event.
+func (l *Level) checkConditions() {
+	if l.State.Rating <= FAIL_RATING {
+		l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayerLost))
+	}
+}
+
 // Update computes a new simulation step for this level.
 func (l *Level) Update(elapsed time.Duration) {
 	l.updateBlocks(elapsed)
@@ -212,6 +226,7 @@ func (l *Level) Update(elapsed time.Duration) {
 	l.updateSpawns(elapsed)
 	l.updateDecals(elapsed)
 	l.Grid.Update(elapsed)
+	l.checkConditions()
 }
 
 func (l *Level) SetMouse(screenX, screenY float32) {
