@@ -45,15 +45,20 @@ func (r *SplashRenderer) Delete() {
 func (r *SplashRenderer) Draw(state *State) {
 	var (
 		configs []twodee.SpriteConfig
+		frame   string = ""
 	)
 	switch state.SplashState {
 	case SplashStart:
-		configs = append(
-			configs,
-			r.splashConfig(r.sheet, mgl32.Vec2{0, 0}, "start.fw"),
-		)
+		frame = "start.fw"
+	case SplashWin:
+		frame = "win.fw"
+	case SplashLose:
+		frame = "lose.fw"
 	}
-	if len(configs) > 0 {
+	if frame != "" {
+		configs = []twodee.SpriteConfig{
+			r.splashConfig(r.sheet, mgl32.Vec2{0, 0}, frame),
+		}
 		r.texture.Bind()
 		r.sprite.Draw(configs)
 		r.texture.Unbind()

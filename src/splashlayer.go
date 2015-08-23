@@ -72,11 +72,15 @@ func (l *SplashLayer) HandleEvent(evt twodee.Event) bool {
 	if l.state.SplashState != SplashDisabled {
 		switch event := evt.(type) {
 		case *twodee.KeyEvent:
-			if event.Type == twodee.Release {
+			if event.Type != twodee.Press {
 				break
 			}
 			switch event.Code {
 			case twodee.KeySpace:
+				l.state.SplashState = SplashDisabled
+			}
+		case *twodee.MouseButtonEvent:
+			if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 				l.state.SplashState = SplashDisabled
 			}
 		}
