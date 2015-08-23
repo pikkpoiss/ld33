@@ -35,17 +35,11 @@ func (s BaseUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 		if event.Type == twodee.Press {
 			switch event.Code {
 			case twodee.Key1:
-				if SkellyBlock.Cost <= level.State.Geld {
-					return NewBlockUiState(&SkellyBlock)
-				}
+				return NewBlockUiState(&SkellyBlock)
 			case twodee.Key2:
-				if SpikesBlock.Cost <= level.State.Geld {
-					return NewBlockUiState(&SpikesBlock)
-				}
+				return NewBlockUiState(&SpikesBlock)
 			case twodee.Key3:
-				if CornerBlock.Cost <= level.State.Geld {
-					return NewBlockUiState(&CornerBlock)
-				}
+				return NewBlockUiState(&CornerBlock)
 			case twodee.Key0:
 				return NewNormalUiState()
 			}

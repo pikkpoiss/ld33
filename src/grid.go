@@ -71,14 +71,14 @@ func (g *Grid) Set(pt Ivec2, item *GridItem) {
 	g.grid.Set(pt.X(), pt.Y(), item)
 }
 
-func (g *Grid) IsBlockValid(origin Ivec2, block *Block, variant int) (ok bool) {
+func (g *Grid) IsBlockValid(placement BlockPlacement) (ok bool) {
 	var (
-		pt   = origin.Plus(block.Offset)
+		pt   = placement.Pos.Plus(placement.Block.Offset)
 		item *GridItem
 	)
 	ok = true
-	for y := 0; y < len(block.Variants[variant]); y++ {
-		for x := 0; x < len(block.Variants[variant][y]); x++ {
+	for y := 0; y < len(placement.Block.Variants[placement.Variant]); y++ {
+		for x := 0; x < len(placement.Block.Variants[placement.Variant][y]); x++ {
 			item = g.Get(pt.Plus(Ivec2{int32(x), int32(y)}))
 			if item != nil && !item.Passable() {
 				ok = false
@@ -92,16 +92,16 @@ func (g *Grid) IsBlockValid(origin Ivec2, block *Block, variant int) (ok bool) {
 // SetBlock attempts to place the block in a "centered" fashion on the given
 // origin. It returns the calculated center as well as a bool indicating
 // whether placement was successful.
-func (g *Grid) SetBlock(origin Ivec2, block *Block, variant int) (Ivec2, bool) {
+func (g *Grid) SetBlock(placement BlockPlacement) (Ivec2, bool) {
 	var (
-		pt = origin.Plus(block.Offset)
+		pt = placement.Pos.Plus(placement.Block.Offset)
 	)
-	if !g.IsBlockValid(origin, block, variant) {
+	if !g.IsBlockValid(placement) {
 		return pt, false
 	}
-	for y := 0; y < len(block.Variants[variant]); y++ {
-		for x := 0; x < len(block.Variants[variant][y]); x++ {
-			tmpl := block.Variants[variant][y][x]
+	for y := 0; y < len(placement.Block.Variants[placement.Variant]); y++ {
+		for x := 0; x < len(placement.Block.Variants[placement.Variant][y]); x++ {
+			tmpl := placement.Block.Variants[placement.Variant][y][x]
 			if tmpl == nil {
 				continue
 			}

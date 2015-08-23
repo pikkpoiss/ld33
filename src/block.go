@@ -24,6 +24,12 @@ const (
 	BlockScaring
 )
 
+type BlockPlacement struct {
+	Pos Ivec2
+	Block   *Block
+	Variant int
+}
+
 type BlockAnimations map[BlockState][]int
 
 var (

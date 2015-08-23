@@ -53,11 +53,6 @@ type Highlight struct {
 	Frame string
 }
 
-type BlockPlacement struct {
-	Block   *Block
-	Variant int
-}
-
 type Level struct {
 	Camera           *twodee.Camera
 	Grid             *Grid
@@ -72,6 +67,7 @@ type Level struct {
 	blocks           map[Ivec2]BlockPlacement
 	fearHistory      []float64
 	fearIndex        int
+	highlighted      *BlockPlacement
 }
 
 const (
@@ -238,9 +234,10 @@ func (l *Level) GetCursor() string {
 func (l *Level) SetBlock(pos mgl32.Vec2, block *Block, variant int) {
 	var (
 		gridCoords = l.Grid.WorldToGrid(pos)
+		placement  = BlockPlacement{gridCoords, block, variant}
 	)
-	if center, ok := l.Grid.SetBlock(gridCoords, block, variant); ok {
-		l.blocks[center] = BlockPlacement{block, variant}
+	if center, ok := l.Grid.SetBlock(placement); ok {
+		l.blocks[center] = placement
 		l.Grid.CalculateDistances()
 	}
 }
@@ -271,18 +268,27 @@ func (l *Level) ClearHighlights() {
 }
 
 func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block, variant int) {
+	l.highlighted = &BlockPlacement{
+		Pos:     l.Grid.WorldToGrid(pos),
+		Block:   block,
+		Variant: variant,
+	}
+	l.RefreshHighlights()
+}
+
+func (l *Level) RefreshHighlights() {
 	var (
-		pre   = l.Grid.WorldToGrid(pos)
-		post  = pre.Plus(block.Offset)
+		pre   = l.highlighted.Pos
+		post  = pre.Plus(l.highlighted.Block.Offset)
 		frame = "special_squares_02"
 	)
 	l.ClearHighlights()
-	if !l.Grid.IsBlockValid(pre, block, variant) {
+	if !l.Grid.IsBlockValid(*l.highlighted) || l.State.Geld < l.highlighted.Block.Cost {
 		frame = "special_squares_03"
 	}
-	for y := 0; y < len(block.Variants[variant]); y++ {
-		for x := 0; x < len(block.Variants[variant][y]); x++ {
-			if block.Variants[variant][y][x] == nil {
+	for y := 0; y < len(l.highlighted.Block.Variants[l.highlighted.Variant]); y++ {
+		for x := 0; x < len(l.highlighted.Block.Variants[l.highlighted.Variant][y]); x++ {
+			if l.highlighted.Block.Variants[l.highlighted.Variant][y][x] == nil {
 				continue
 			}
 			l.Highlights = append(l.Highlights, Highlight{
@@ -307,6 +313,11 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 	l.ActiveMobCount++
 }
 
+func (l *Level) AddGeld(amount int) {
+	l.State.Geld += amount
+	l.RefreshHighlights()
+}
+
 func (l *Level) despawnMob(i int) {
 	var fear = l.Mobs[i].Fear
 	switch {
@@ -318,7 +329,7 @@ func (l *Level) despawnMob(i int) {
 	l.fearHistory[l.fearIndex] = fear
 	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
 	l.State.Rating = l.calculateRating()
-	l.State.Geld += int(math.Floor(fear*10.0 + 0.5))
+	l.AddGeld(int(math.Floor(fear*10.0 + 0.5)))
 	l.disableMob(i)
 }
 
