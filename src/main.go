@@ -68,7 +68,7 @@ func NewApplication() (app *Application, err error) {
 		State:            state,
 		GameEventHandler: gameEventHandler,
 	}
-	if gamelayer, err = NewGameLayer(app); err != nil {
+	if gamelayer, err = NewGameLayer(state, app); err != nil {
 		return
 	}
 	layers.Push(gamelayer)

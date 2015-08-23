@@ -49,6 +49,7 @@ func (s *SpawnZone) Spawn() bool {
 type Level struct {
 	Camera         *twodee.Camera
 	Grid           *Grid
+	State          *State
 	Mobs           []Mob
 	ActiveMobCount int
 	MousePos       mgl32.Vec2
@@ -61,7 +62,7 @@ const (
 	MaxMobs = 200
 )
 
-func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
+func NewLevel(state *State, sheet *twodee.Spritesheet) (level *Level, err error) {
 	var (
 		mobs    = make([]Mob, MaxMobs)
 		grid    *Grid
@@ -95,6 +96,7 @@ func NewLevel(sheet *twodee.Spritesheet) (level *Level, err error) {
 	level = &Level{
 		Camera:         camera,
 		Grid:           grid,
+		State:          state,
 		Mobs:           mobs,
 		ActiveMobCount: 0,
 		entries:        entries,
@@ -180,6 +182,7 @@ func (l *Level) AddMob(pos mgl32.Vec2) {
 }
 
 func (l *Level) disableMob(i int) {
+	l.State.Geld = l.State.Geld + (l.Mobs[i].Fear * 10)
 	l.ActiveMobCount--
 	l.Mobs[l.ActiveMobCount], l.Mobs[i] = l.Mobs[i], l.Mobs[l.ActiveMobCount]
 	l.Mobs[l.ActiveMobCount].Disable()

@@ -27,11 +27,13 @@ type GameLayer struct {
 	app           *Application
 	level         *Level
 	uiState       UiState
+	state         *State
 }
 
-func NewGameLayer(app *Application) (layer *GameLayer, err error) {
+func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) {
 	layer = &GameLayer{
-		app: app,
+		app:   app,
+		state: state,
 	}
 	err = layer.Reset()
 	return
@@ -75,7 +77,7 @@ func (l *GameLayer) Reset() (err error) {
 	if err = l.loadSpritesheet(); err != nil {
 		return
 	}
-	if l.level, err = NewLevel(l.spriteSheet); err != nil {
+	if l.level, err = NewLevel(l.state, l.spriteSheet); err != nil {
 		return
 	}
 	l.uiState = NewNormalUiState()
