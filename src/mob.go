@@ -144,7 +144,7 @@ func (m *Mob) setState(state MobState) {
 	}
 }
 
-func (m *Mob) increaseFear(fear int) {
+func (m *Mob) IncreaseFear(fear int) {
 	m.Fear = m.Fear + fear
 	if m.Fear > 10 {
 		m.Alive = false

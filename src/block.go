@@ -21,6 +21,7 @@ type Block struct {
 	Offset     Ivec2
 	Range      float32 // Radius of effectiveness.
 	MaxTargets int     // -1 for infinite.
+	FearPerNS  int     // Amount of fear added to target per nanosecond.
 	Cost       int
 }
 
@@ -28,36 +29,38 @@ var (
 	OneBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, 0, "skeleton01_00"},
+				&GridItem{false, -1, "skeleton01_00"},
 			},
 		},
 		Ivec2{0, 0},
 		1.5,
 		1,
+		0,
 		10,
 	}
 
 	ThreeBlock = Block{
 		[][]*GridItem{
 			[]*GridItem{
-				&GridItem{false, 0, "special_squares_00"},
-				&GridItem{false, 0, "special_squares_00"},
-				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, -1, "spikes01_00"},
+				&GridItem{false, -1, "spikes01_00"},
+				&GridItem{false, -1, "spikes01_00"},
 			},
 			[]*GridItem{
-				&GridItem{false, 0, "special_squares_00"},
-				&GridItem{false, 0, "special_squares_00"},
-				&GridItem{false, 0, "special_squares_00"},
+				nil,
+				nil,
+				nil,
 			},
 			[]*GridItem{
-				&GridItem{false, 0, "special_squares_00"},
-				&GridItem{false, 0, "special_squares_00"},
-				&GridItem{false, 0, "special_squares_00"},
+				&GridItem{false, -1, "spikes01_00"},
+				&GridItem{false, -1, "spikes01_00"},
+				&GridItem{false, -1, "spikes01_00"},
 			},
 		},
 		Ivec2{-1, -1},
 		5.0,
 		3,
+		0,
 		100,
 	}
 )
