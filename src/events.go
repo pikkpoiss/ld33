@@ -22,6 +22,10 @@ const (
 	PlayBackgroundMusic twodee.GameEventType = iota
 	PauseMusic
 	ResumeMusic
+	PlayPlaceBlockEffect
+	PlayMrBonesEffect
+	PlaySpikesEffect
+	PlayDeathEffect
 	PlayerLost
 	SENTINEL
 )

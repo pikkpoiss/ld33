@@ -58,6 +58,7 @@ type Highlight struct {
 }
 
 type Level struct {
+	App              *Application
 	Camera           *twodee.Camera
 	Grid             *Grid
 	State            *State
@@ -193,12 +194,21 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 					// TODO: uhhh this should be prettier.
 					killed = append(killed, i)
 					l.AddDecal(mob.Pos.Add(mgl32.Vec2{0, 0.5}), "ghost01_00", 2, 2*time.Second)
+					l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayDeathEffect))
 					l.State.Rating = l.penalizeRating()
 				}
 			}
 		}
 		if numHit > 0 {
 			l.Grid.UpdateBlockState(pos, placement.Block, BlockScaring, placement.Variant)
+			switch placement.Block.Title {
+			case "Mr. Bones":
+				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayMrBonesEffect))
+			case "Spiketron 5000":
+				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlaySpikesEffect))
+			case "Spiketron 6000 GT":
+				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlaySpikesEffect))
+			}
 		} else {
 			l.Grid.UpdateBlockState(pos, placement.Block, BlockNormal, placement.Variant)
 		}
