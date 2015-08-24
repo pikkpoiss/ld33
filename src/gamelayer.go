@@ -16,7 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
 	"io/ioutil"
 	"time"
 )
