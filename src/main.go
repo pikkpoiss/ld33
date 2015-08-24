@@ -38,7 +38,7 @@ type Application struct {
 
 func NewApplication() (app *Application, err error) {
 	var (
-		name             = "LD33"
+		name             = "Screamporium - LD33"
 		layers           *twodee.Layers
 		context          *twodee.Context
 		menulayer        *MenuLayer

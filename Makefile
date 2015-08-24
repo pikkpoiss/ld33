@@ -1,6 +1,6 @@
 .phony: clean
 
-PROJECT = ld33
+PROJECT = screamporium
 SOURCES = $(wildcard src/*.go)
 ASSETS  = $(wildcard src/resources/*/*) $(wildcard src/resources/*)
 VERSION = $(shell cat VARS | grep TDP_VERSION | sed s/export\ TDP_VERSION=//g)

@@ -1,3 +1,3 @@
 #!/bin/bash
 cd "${0%/*}"
-LD_LIBRARY_PATH=`pwd` ./ld33
+LD_LIBRARY_PATH=`pwd` ./screamporium
