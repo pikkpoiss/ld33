@@ -16,7 +16,6 @@ package main
 
 import (
 	"../lib/twodee"
-	"fmt"
 	"io/ioutil"
 	"time"
 )
@@ -135,7 +134,9 @@ func (l *GameLayer) PlayerLost(e twodee.GETyper) {
 }
 
 func (l *GameLayer) PlayerWon(e twodee.GETyper) {
-	fmt.Println("Player won, horray!")
+	l.state.Reset()
+	l.state.SplashState = SplashWin
+	l.LoadLevel()
 }
 
 func (l *GameLayer) Update(elapsed time.Duration) {
