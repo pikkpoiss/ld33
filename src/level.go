@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	FAIL_RATING  = 0
-	WIN_RATING   = 9
+	FAIL_RATING  = 1
+	WIN_RATING   = 8
 	WIN_DURATION = 5 * time.Second
 )
 
