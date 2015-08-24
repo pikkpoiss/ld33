@@ -30,6 +30,8 @@ func NewCircularBuffer(size int) *CircularBuffer {
 	}
 }
 
+// AddEntry adds the indicated value to the buffer, overwriting entries as
+// necessary, updating the running sum, and advancing the idx.
 func (b *CircularBuffer) AddEntry(v float64) {
 	pVal := b.buffer[b.idx]
 	b.sum -= pVal
