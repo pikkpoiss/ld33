@@ -18,8 +18,8 @@
 - [x] Mobs path to despawn
 - [x] Mobs yield gold upon despawn
 - [x] "Star rating" review system
-- [] Mobs must be scared within "an inch of their life"
-- [] Lose state
+- [x] Mobs must be scared within "an inch of their life"
+- [x] Lose state
 - [] Win state
 
 ### Stretch?

@@ -29,6 +29,7 @@ type GameLayer struct {
 	uiState              UiState
 	state                *State
 	playerLostObserverId int
+	playerWonObserverId  int
 }
 
 func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) {
@@ -37,12 +38,18 @@ func NewGameLayer(state *State, app *Application) (layer *GameLayer, err error) 
 		state: state,
 	}
 	layer.playerLostObserverId = app.GameEventHandler.AddObserver(PlayerLost, layer.PlayerLost)
+	layer.playerWonObserverId = app.GameEventHandler.AddObserver(PlayerWon, layer.PlayerWon)
 	err = layer.Reset()
 	return
 }
 
 func (l *GameLayer) Delete() {
 	if l.playerLostObserverId != 0 {
+		l.app.GameEventHandler.RemoveObserver(
+			PlayerLost, l.playerLostObserverId)
+		l.playerLostObserverId = 0
+	}
+	if l.playerWonObserverId != 0 {
 		l.app.GameEventHandler.RemoveObserver(
 			PlayerLost, l.playerLostObserverId)
 		l.playerLostObserverId = 0
@@ -124,6 +131,10 @@ func (l *GameLayer) PlayerLost(e twodee.GETyper) {
 	l.state.Reset()
 	l.state.SplashState = SplashLose
 	l.LoadLevel()
+}
+
+func (l *GameLayer) PlayerWon(e twodee.GETyper) {
+	fmt.Println("Player won, horray!")
 }
 
 func (l *GameLayer) Update(elapsed time.Duration) {
