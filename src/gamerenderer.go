@@ -102,7 +102,7 @@ func (r *GameRenderer) Draw(level *Level) {
 		if !mob.Enabled { // No enabled mobs after first disabled mob.
 			break
 		}
-		r.spritesDynamic = append(r.spritesDynamic, mob.SpriteConfig(r.sheet))
+		r.spritesDynamic = mob.AddSpriteConfig(r.sheet, r.spritesDynamic)
 	}
 	for _, decal := range level.Decals {
 		if !decal.Enabled {

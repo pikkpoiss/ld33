@@ -14,6 +14,7 @@ build_aesprite() {
 
 build_aesprite numbered_squares
 build_aesprite special_squares
+build_aesprite overlays
 build_aesprite highlight
 build_aesprite human01
 build_aesprite skeleton01

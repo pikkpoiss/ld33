@@ -104,22 +104,48 @@ func (m *Mob) Disable() {
 	m.Fear = 1.0
 }
 
-func (m *Mob) SpriteConfig(sheet *twodee.Spritesheet) twodee.SpriteConfig {
+func (m *Mob) AddSpriteConfig(sheet *twodee.Spritesheet, config []twodee.SpriteConfig) []twodee.SpriteConfig {
 	var (
-		frame          = sheet.GetFrame(fmt.Sprintf("human01_%02d", m.Frame()))
-		scaleX float32 = 1.0
+		frame               = sheet.GetFrame(fmt.Sprintf("human01_%02d", m.Frame()))
+		scaleX      float32 = 1.0
+		view        twodee.ModelViewConfig
+		overlayview twodee.ModelViewConfig
 	)
 	if m.State&Left == Left {
 		scaleX = -1.0
 	}
-	return twodee.SpriteConfig{
-		View: twodee.ModelViewConfig{
-			m.Pos.X(), m.Pos.Y() + frame.Height/4.0, 0.0,
-			0, 0, 0,
-			scaleX, 1.0, 1.0,
-		},
-		Frame: frame.Frame,
+	view = twodee.ModelViewConfig{
+		m.Pos.X(), m.Pos.Y() + frame.Height/4.0, 0.0,
+		0, 0, 0,
+		scaleX, 1.0, 1.0,
 	}
+	overlayview = twodee.ModelViewConfig{
+		m.Pos.X(), m.Pos.Y() + frame.Height/4.0 - 0.01, 0.0,
+		0, 0, 0,
+		scaleX, 1.0, 1.0,
+	}
+	config = append(config, twodee.SpriteConfig{
+		View:  view,
+		Frame: frame.Frame,
+	})
+	switch {
+	case m.Fear < 5:
+		config = append(config, twodee.SpriteConfig{
+			View:  overlayview,
+			Frame: sheet.GetFrame("overlays_01").Frame,
+		})
+	case m.Fear > 9:
+		config = append(config, twodee.SpriteConfig{
+			View:  overlayview,
+			Frame: sheet.GetFrame("overlays_02").Frame,
+		})
+	case m.Fear > 7:
+		config = append(config, twodee.SpriteConfig{
+			View:  overlayview,
+			Frame: sheet.GetFrame("overlays_00").Frame,
+		})
+	}
+	return config
 }
 
 func (m *Mob) remState(state MobState) {
