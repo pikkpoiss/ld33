@@ -14,6 +14,10 @@
 
 package main
 
+import (
+	"math"
+)
+
 type CircularBuffer struct {
 	buffer                []float64
 	idx, numEntries, size int
@@ -47,6 +51,16 @@ func (b *CircularBuffer) Sample() float64 {
 		return 0.0
 	}
 	return b.sum / float64(b.numEntries)
+}
+
+// AdjustAll is a masive hack to support what Level.penalizeRating used to do.
+func (b *CircularBuffer) AdjustAll(delta, min float64) {
+	b.sum = 0
+	for i := 0; i < b.numEntries; i++ {
+		v := b.buffer[i]
+		b.buffer[i] = math.Max(v+delta, min)
+		b.sum += b.buffer[i]
+	}
 }
 
 func minInt(a, b int) int {

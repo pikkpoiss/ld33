@@ -72,8 +72,7 @@ type Level struct {
 	entries          []SpawnZone
 	exit             SpawnZone
 	blocks           map[Ivec2]BlockPlacement
-	fearHistory      []float64
-	fearIndex        int
+	fearBuffer       *CircularBuffer
 	highlighted      *BlockPlacement
 	gameEventHandler *twodee.GameEventHandler
 	durAtWinRating   time.Duration
@@ -95,8 +94,8 @@ func NewLevel(state *State, sheet *twodee.Spritesheet, gameEventHandler *twodee.
 			NewSpawnZone(Ivec2{4, 14}),
 			NewSpawnZone(Ivec2{4, 4}),
 		}
-		exit        = NewSpawnZone(Ivec2{24, 9})
-		fearHistory = make([]float64, 100)
+		exit       = NewSpawnZone(Ivec2{24, 9})
+		fearBuffer = NewCircularBuffer(100)
 	)
 	if grid, err = NewGrid(); err != nil {
 		return
@@ -121,7 +120,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet, gameEventHandler *twodee.
 	}
 
 	for i := 0; i < 100; i++ {
-		fearHistory[i] = 5
+		fearBuffer.AddEntry(5.0)
 	}
 
 	level = &Level{
@@ -135,8 +134,7 @@ func NewLevel(state *State, sheet *twodee.Spritesheet, gameEventHandler *twodee.
 		entries:          entries,
 		exit:             exit,
 		blocks:           make(map[Ivec2]BlockPlacement),
-		fearHistory:      fearHistory,
-		fearIndex:        0,
+		fearBuffer:       fearBuffer,
 		gameEventHandler: gameEventHandler,
 		durAtWinRating:   0,
 	}
@@ -281,23 +279,13 @@ func (l *Level) SetBlock(pos mgl32.Vec2, block *Block, variant int) {
 
 // calculateRating returns the rounded integer average of all values in
 // fearHistory.
-// TODO: The rating should probably be cached and recalculated when mobs
-// despawn, as opposed to generated anew each time like this...
 func (l *Level) calculateRating() int {
-	sum := 0.0
-	for _, v := range l.fearHistory {
-		sum += v
-	}
-	return int(math.Floor(sum/float64(len(l.fearHistory)) + 0.5))
+	return int(math.Floor(l.fearBuffer.Sample() + 0.5))
 }
 
 func (l *Level) penalizeRating() int {
-	sum := 0.0
-	for i := range l.fearHistory {
-		l.fearHistory[i] = math.Max(l.fearHistory[i]-1, 0)
-		sum += l.fearHistory[i]
-	}
-	return int(math.Floor(sum/float64(len(l.fearHistory)) + 0.5))
+	l.fearBuffer.AdjustAll(-1.0, 0.0)
+	return l.calculateRating()
 }
 
 func (l *Level) clearHighlights() {
@@ -371,8 +359,7 @@ func (l *Level) despawnMob(i int) {
 	case fear > 8:
 		l.AddDecal(l.Mobs[i].Pos.Add(mgl32.Vec2{0, 1.5}), "bubble_01", 1, 500*time.Millisecond)
 	}
-	l.fearHistory[l.fearIndex] = fear
-	l.fearIndex = (l.fearIndex + 1) % len(l.fearHistory)
+	l.fearBuffer.AddEntry(fear)
 	l.State.Rating = l.calculateRating()
 	l.AddGeld(int(math.Floor(fear + 0.5)))
 	l.disableMob(i)
