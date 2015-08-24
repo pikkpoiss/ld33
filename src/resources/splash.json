@@ -1,7 +1,7 @@
 {"frames": [
 
 {
-	"filename": "lose",
+	"filename": "instructions",
 	"frame": {"x":2,"y":2,"w":512,"h":320},
 	"rotated": false,
 	"trimmed": false,
@@ -10,7 +10,7 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "start",
+	"filename": "lose.fw",
 	"frame": {"x":2,"y":324,"w":512,"h":320},
 	"rotated": false,
 	"trimmed": false,
@@ -19,8 +19,26 @@
 	"pivot": {"x":0.5,"y":0.5}
 },
 {
-	"filename": "win",
+	"filename": "lose",
+	"frame": {"x":2,"y":324,"w":512,"h":320},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":320},
+	"sourceSize": {"w":512,"h":320},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "start",
 	"frame": {"x":2,"y":646,"w":512,"h":320},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":320},
+	"sourceSize": {"w":512,"h":320},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "win",
+	"frame": {"x":2,"y":968,"w":512,"h":320},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":512,"h":320},
@@ -32,8 +50,8 @@
 	"version": "1.0",
 	"image": "splash.png",
 	"format": "RGBA8888",
-	"size": {"w":1024,"h":1024},
+	"size": {"w":1024,"h":2048},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:a4a573dcdfcf65386edfb157f776cae7:817ad20844ddc5f672fcf4536518da51:17912d807795a397b5ccd2ab39a16cd0$"
+	"smartupdate": "$TexturePacker:SmartUpdate:cc2b6cc843963134eba26b7d92fdf8f5:784911f294e292b5c20fda5d4e1f7ac1:17912d807795a397b5ccd2ab39a16cd0$"
 }
 }

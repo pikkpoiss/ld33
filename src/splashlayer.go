@@ -27,6 +27,7 @@ const (
 	SplashStart
 	SplashWin
 	SplashLose
+	SplashInstructions
 )
 
 type SplashLayer struct {
@@ -68,6 +69,15 @@ func (l *SplashLayer) Render() {
 	}
 }
 
+func (l *SplashLayer) AdvanceState() {
+	switch l.state.SplashState {
+	case SplashStart:
+		l.state.SplashState = SplashInstructions
+	default:
+		l.state.SplashState = SplashDisabled
+	}
+}
+
 func (l *SplashLayer) HandleEvent(evt twodee.Event) bool {
 	if l.state.SplashState != SplashDisabled {
 		switch event := evt.(type) {
@@ -77,11 +87,11 @@ func (l *SplashLayer) HandleEvent(evt twodee.Event) bool {
 			}
 			switch event.Code {
 			case twodee.KeySpace:
-				l.state.SplashState = SplashDisabled
+				l.AdvanceState()
 			}
 		case *twodee.MouseButtonEvent:
 			if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
-				l.state.SplashState = SplashDisabled
+				l.AdvanceState()
 			}
 		}
 	}

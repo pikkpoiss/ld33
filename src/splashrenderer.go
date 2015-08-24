@@ -54,6 +54,8 @@ func (r *SplashRenderer) Draw(state *State) {
 		frame = "win"
 	case SplashLose:
 		frame = "lose"
+	case SplashInstructions:
+		frame = "instructions"
 	}
 	if frame != "" {
 		configs = []twodee.SpriteConfig{
