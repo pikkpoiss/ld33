@@ -282,10 +282,7 @@ func (l *Level) DeleteBlock() {
 	if l.deleteable == nil {
 		return
 	}
-	var (
-		placement = l.deleteable
-	)
-	if center, ok := l.Grid.DeleteBlock(*placement); ok {
+	if center, ok := l.Grid.DeleteBlock(*l.deleteable); ok {
 		delete(l.blocks, center)
 		l.UnsetHighlights()
 		l.Grid.CalculateDistances()
