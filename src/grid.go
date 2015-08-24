@@ -112,7 +112,7 @@ func (g *Grid) SetBlock(placement BlockPlacement) (Ivec2, bool) {
 			)
 		}
 	}
-	return pt, true
+	return placement.Pos, true
 }
 
 func (g *Grid) UpdateBlockState(origin Ivec2, block *Block, state BlockState, variant int) {

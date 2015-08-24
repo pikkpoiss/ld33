@@ -90,9 +90,9 @@ func NewLevel(state *State, sheet *twodee.Spritesheet, gameEventHandler *twodee.
 		grid    *Grid
 		camera  *twodee.Camera
 		entries = []SpawnZone{
+			NewSpawnZone(Ivec2{3, 4}),
 			NewSpawnZone(Ivec2{4, 9}),
-			NewSpawnZone(Ivec2{4, 14}),
-			NewSpawnZone(Ivec2{4, 4}),
+			NewSpawnZone(Ivec2{5, 14}),
 		}
 		exit       = NewSpawnZone(Ivec2{24, 9})
 		fearBuffer = NewCircularBuffer(100)
@@ -180,7 +180,7 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 
 func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, placement := range l.blocks {
-		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}
+		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}.Add(mgl32.Vec2{0.5,0.5}) // Adjust for center of block
 		fear := placement.Block.FearPerSec * elapsed.Seconds()
 		numHit := 0
 		killed := make([]int, 0, placement.Block.MaxTargets)
