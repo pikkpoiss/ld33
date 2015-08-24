@@ -175,7 +175,7 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 		entry := &l.entries[i]
 		entry.AddCharge(charge)
 		for entry.Spawn() {
-			l.SpawnMob(entry.Pos)
+			l.SpawnMob(entry.Pos.Plus(Ivec2{1, 1})) // A dirty hack for using a big sprite
 		}
 	}
 }

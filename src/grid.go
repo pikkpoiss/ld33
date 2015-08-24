@@ -58,7 +58,7 @@ func NewGrid() (g *Grid, err error) {
 }
 
 func (g *Grid) AddSource(pt Ivec2) {
-	g.Set(pt, NewGridItem(false, "special_squares_00", nil))
+	g.Set(pt, NewGridItem(false, "gate_01", nil))
 	g.sources = append(g.sources, pt)
 }
 
