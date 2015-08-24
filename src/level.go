@@ -74,6 +74,7 @@ type Level struct {
 	blocks           map[Ivec2]BlockPlacement
 	fearBuffer       *CircularBuffer
 	highlighted      *BlockPlacement
+	deleteable       *BlockPlacement
 	gameEventHandler *twodee.GameEventHandler
 	durAtWinRating   time.Duration
 }
@@ -180,7 +181,7 @@ func (l *Level) updateSpawns(elapsed time.Duration) {
 
 func (l *Level) updateBlocks(elapsed time.Duration) {
 	for pos, placement := range l.blocks {
-		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}.Add(mgl32.Vec2{0.5,0.5}) // Adjust for center of block
+		posV := mgl32.Vec2{float32(pos.X()), float32(pos.Y())}.Add(mgl32.Vec2{0.5, 0.5}) // Adjust for center of block
 		fear := placement.Block.FearPerSec * elapsed.Seconds()
 		numHit := 0
 		killed := make([]int, 0, placement.Block.MaxTargets)
@@ -277,6 +278,20 @@ func (l *Level) SetBlock(pos mgl32.Vec2, block *Block, variant int) {
 	}
 }
 
+func (l *Level) DeleteBlock() {
+	if l.deleteable == nil {
+		return
+	}
+	var (
+		placement = l.deleteable
+	)
+	if center, ok := l.Grid.DeleteBlock(*placement); ok {
+		delete(l.blocks, center)
+		l.UnsetHighlights()
+		l.Grid.CalculateDistances()
+	}
+}
+
 // calculateRating returns the rounded integer average of all values in
 // fearHistory.
 func (l *Level) calculateRating() int {
@@ -298,12 +313,14 @@ func (l *Level) SetHighlights(pos mgl32.Vec2, block *Block, variant int) {
 		Block:   block,
 		Variant: variant,
 	}
+	l.deleteable = nil
 	l.RefreshHighlights()
 }
 
 func (l *Level) UnsetHighlights() {
 	l.clearHighlights()
 	l.highlighted = nil
+	l.deleteable = nil
 }
 
 func (l *Level) RefreshHighlights() {
@@ -329,6 +346,37 @@ func (l *Level) RefreshHighlights() {
 				frame,
 			})
 		}
+	}
+}
+
+func (l *Level) SetDeleteHighlights(pos mgl32.Vec2) {
+	var (
+		gridCoords = l.Grid.WorldToGrid(pos)
+		blockBase  Ivec2
+		found      = false
+	)
+	for _, p := range l.blocks {
+		if p.Intersects(gridCoords) {
+			l.clearHighlights()
+			l.deleteable = &p
+			found = true
+			blockBase = p.Pos.Plus(p.Block.Offset)
+			for y := 0; y < len(p.Block.Variants[p.Variant]); y++ {
+				for x := 0; x < len(p.Block.Variants[p.Variant][y]); x++ {
+					if p.Block.Variants[p.Variant][y][x] == nil {
+						continue
+					}
+					l.Highlights = append(l.Highlights, Highlight{
+						blockBase.Plus(Ivec2{int32(x), int32(y)}),
+						"special_squares_04",
+					})
+				}
+			}
+			break
+		}
+	}
+	if !found {
+		l.UnsetHighlights()
 	}
 }
 

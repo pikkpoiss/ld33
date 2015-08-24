@@ -29,6 +29,7 @@ type HudItem struct {
 	Enabled     bool
 	Highlighted bool
 	Block       *Block
+	KeyText     string
 }
 
 type HudLayer struct {
@@ -165,9 +166,9 @@ func (h *HudLayer) renderText() {
 	}
 
 	for i, item := range h.items {
-		texture = h.cacheText(fmt.Sprintf("key%v", i), h.pixelFont, strconv.Itoa(i+1))
+		texture = h.cacheText(fmt.Sprintf("key%v", i), h.pixelFont, item.KeyText)
 		if texture != nil {
-			h.textRenderer.Draw(texture, item.HitBox.Min.X(), item.HitBox.Min.Y(), h.textScale)
+			h.textRenderer.Draw(texture, item.HitBox.Min.X() + 0.1, item.HitBox.Min.Y(), h.textScale)
 		}
 		if item.Highlighted {
 			texture = h.cacheText("highlight", h.pixelFont, item.Block.Title)
@@ -204,7 +205,11 @@ func (h *HudLayer) HandleEvent(evt twodee.Event) bool {
 		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
 			for _, item := range h.items {
 				if item.Highlighted {
-					h.app.SetUiState(NewBlockUiState(item.Block))
+					if item.KeyText == "d" { // ugh
+						h.app.SetUiState(NewDeleteUiState())
+					} else {
+						h.app.SetUiState(NewBlockUiState(item.Block))
+					}
 					return false
 				}
 			}
@@ -232,6 +237,7 @@ func (h *HudLayer) makeItems() {
 		h.items[i].Highlighted = false
 		h.items[i].HitBox = twodee.Rect(0, bottom, boxWidth, top)
 		h.items[i].Block = block
+		h.items[i].KeyText = block.Key
 	}
 }
 

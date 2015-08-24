@@ -119,12 +119,12 @@ func (r *GameRenderer) Draw(level *Level) {
 	sort.Sort(ByY(r.spritesDynamic))
 	r.effects.Bind()
 	r.sprite.Draw(r.spritesStatic)
-	if len(r.spritesHighlight) > 0 {
-		r.sprite.Draw(r.spritesHighlight)
-	}
 	r.sprite.Draw(r.spritesDynamic)
 	if len(r.spritesDecals) > 0 {
 		r.sprite.Draw(r.spritesDecals)
+	}
+	if len(r.spritesHighlight) > 0 {
+		r.sprite.Draw(r.spritesHighlight)
 	}
 	r.effects.Unbind()
 	r.effects.Draw()

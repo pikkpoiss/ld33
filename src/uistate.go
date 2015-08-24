@@ -34,12 +34,14 @@ func (s BaseUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 	case *twodee.KeyEvent:
 		if event.Type == twodee.Press {
 			code := int(event.Code - twodee.Key1)
-			if code >= 0 && code < 9 && code < len(HudBlocks) {
-				return NewBlockUiState(HudBlocks[code])
+			if code >= 0 && code < 9 && code < len(HudBlocks) - 1 {
+				return NewBlockUiState(HudBlocks[code + 1]) // Skip first (delete)
 			}
 			switch event.Code {
 			case twodee.Key0:
 				return NewNormalUiState()
+			case twodee.KeyD:
+				return NewDeleteUiState()
 			}
 		}
 	}
@@ -71,6 +73,37 @@ func (s *NormalUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
 			if level.State.Debug {
 				level.AddMob(level.GetMouse())
 			}
+		}
+	}
+	return nil
+}
+
+type DeleteUiState struct {
+	BaseUiState
+}
+
+func NewDeleteUiState() UiState {
+	return &DeleteUiState{}
+}
+
+func (s *DeleteUiState) Register(level *Level) {
+	level.SetCursor("mouse_02")
+}
+
+func (s *DeleteUiState) Unregister(level *Level) {
+	level.UnsetHighlights()
+}
+
+func (s *DeleteUiState) HandleEvent(level *Level, evt twodee.Event) UiState {
+	if state := s.BaseUiState.HandleEvent(level, evt); state != nil {
+		return state
+	}
+	switch event := evt.(type) {
+	case *twodee.MouseMoveEvent:
+		level.SetDeleteHighlights(level.GetMouse())
+	case *twodee.MouseButtonEvent:
+		if event.Type == twodee.Press && event.Button == twodee.MouseButtonLeft {
+			level.DeleteBlock()
 		}
 	}
 	return nil

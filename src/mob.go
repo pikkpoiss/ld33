@@ -139,7 +139,7 @@ func (m *Mob) AddSpriteConfig(sheet *twodee.Spritesheet, config []twodee.SpriteC
 			View:  overlayview,
 			Frame: sheet.GetFrame("overlays_02").Frame,
 		})
-	case m.Fear > 7:
+	case m.Fear > 8:
 		config = append(config, twodee.SpriteConfig{
 			View:  overlayview,
 			Frame: sheet.GetFrame("overlays_00").Frame,

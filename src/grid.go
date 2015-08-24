@@ -115,6 +115,22 @@ func (g *Grid) SetBlock(placement BlockPlacement) (Ivec2, bool) {
 	return placement.Pos, true
 }
 
+func (g *Grid) DeleteBlock(placement BlockPlacement) (Ivec2, bool) {
+	for y := 0; y < len(placement.Block.Variants[placement.Variant]); y++ {
+		for x := 0; x < len(placement.Block.Variants[placement.Variant][y]); x++ {
+			tmpl := placement.Block.Variants[placement.Variant][y][x]
+			if tmpl == nil {
+				continue
+			}
+			g.Set(
+				placement.Pos.Plus(Ivec2{int32(x), int32(y)}),
+				nil,
+			)
+		}
+	}
+	return placement.Pos, true
+}
+
 func (g *Grid) UpdateBlockState(origin Ivec2, block *Block, state BlockState, variant int) {
 	var (
 		item *GridItem
