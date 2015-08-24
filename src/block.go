@@ -84,13 +84,15 @@ type BlockTemplate [][]*GridItemTemplate
 
 // TODO: Introduce a cooldown for scaring people.
 type Block struct {
-	Variants   []BlockTemplate
-	Offset     Ivec2
-	Range      float32 // Radius of effectiveness.
-	MaxTargets int     // -1 for infinite.
-	FearPerSec float64 // Amount of fear added to target per second.
-	Cost       int
-	Title      string
+	Variants     []BlockTemplate
+	Offset       Ivec2
+	Range        float32 // Radius of effectiveness.
+	MaxTargets   int     // -1 for infinite.
+	FearPerSec   float64 // Amount of fear added to target per second.
+	Cost         int
+	Title        string
+	IconEnabled  string
+	IconDisabled string
 }
 
 var (
@@ -102,12 +104,14 @@ var (
 				},
 			},
 		},
-		Offset:     Ivec2{0, 0},
-		Range:      1.5,
-		MaxTargets: 1,
-		FearPerSec: 2.0,
-		Cost:       10,
-		Title:      "Mr. Bones",
+		Offset:       Ivec2{0, 0},
+		Range:        1.5,
+		MaxTargets:   1,
+		FearPerSec:   2.0,
+		Cost:         10,
+		Title:        "Mr. Bones",
+		IconEnabled:  "icons_00",
+		IconDisabled: "icons_desaturated_00",
 	}
 
 	SpikesBlock = Block{
@@ -123,12 +127,14 @@ var (
 				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
 			},
 		},
-		Offset:     Ivec2{-1, -1},
-		Range:      5.0,
-		MaxTargets: 3,
-		FearPerSec: 0.5,
-		Cost:       100,
-		Title:      "Spiketron 5000",
+		Offset:       Ivec2{-1, -1},
+		Range:        5.0,
+		MaxTargets:   3,
+		FearPerSec:   0.5,
+		Cost:         100,
+		Title:        "Spiketron 5000",
+		IconEnabled:  "icons_01",
+		IconDisabled: "icons_desaturated_01",
 	}
 
 	CornerBlock = Block{
@@ -154,12 +160,14 @@ var (
 				[]*GridItemTemplate{SpikesTemplate, nil, SpikesTemplate},
 			},
 		},
-		Offset:     Ivec2{-1, -1},
-		Range:      5.0,
-		MaxTargets: 3,
-		FearPerSec: 0.5,
-		Cost:       100,
-		Title:      "Spiketron 6000 GT",
+		Offset:       Ivec2{-1, -1},
+		Range:        5.0,
+		MaxTargets:   3,
+		FearPerSec:   0.5,
+		Cost:         100,
+		Title:        "Spiketron 6000 GT",
+		IconEnabled:  "icons_02",
+		IconDisabled: "icons_desaturated_02",
 	}
 
 	ScaryBox = Block{
@@ -168,12 +176,14 @@ var (
 				[]*GridItemTemplate{BoxTemplate},
 			},
 		},
-		Offset:     Ivec2{0, 0},
-		Range:      1.5,
-		MaxTargets: 1,
-		FearPerSec: -2.0,
-		Cost:       50,
-		Title:      "Unscarybox",
+		Offset:       Ivec2{0, 0},
+		Range:        1.5,
+		MaxTargets:   1,
+		FearPerSec:   -2.0,
+		Cost:         50,
+		Title:        "Unscarybox",
+		IconEnabled:  "icons_03",
+		IconDisabled: "icons_desaturated_03",
 	}
 )
 

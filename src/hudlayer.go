@@ -107,13 +107,13 @@ func (h *HudLayer) renderToolbarItems(configs []twodee.SpriteConfig) []twodee.Sp
 		x := item.HitBox.Max.X()
 		y := item.HitBox.Min.Y()
 		switch {
-		case item.Highlighted:
-			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 4, y))
-			configs = append(configs, h.highlightSpriteConfig(h.spriteSheet, mgl32.Vec2{x, y}, "highlight_00"))
 		case item.Block.Cost <= h.state.Geld:
-			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 1, y))
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, item.Block.IconEnabled, y))
 		default:
-			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, 15, y))
+			configs = append(configs, h.toolbarSpriteConfig(h.spriteSheet, item.Block.IconDisabled, y))
+		}
+		if item.Highlighted {
+			configs = append(configs, h.highlightSpriteConfig(h.spriteSheet, mgl32.Vec2{x, y}, "highlight_00"))
 		}
 	}
 	return configs
@@ -285,9 +285,9 @@ func (h *HudLayer) loadSpritesheet() (err error) {
 	return
 }
 
-func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, block float32, y float32) twodee.SpriteConfig {
+func (h *HudLayer) toolbarSpriteConfig(sheet *twodee.Spritesheet, name string, y float32) twodee.SpriteConfig {
 	var frame *twodee.SpritesheetFrame
-	frame = sheet.GetFrame(fmt.Sprintf("numbered_squares_%02v", block))
+	frame = sheet.GetFrame(name)
 	xPosition := (frame.Width / 2.0) + 1.2
 	yPosition := y + (frame.Height / 2.0) // Bottom aligned
 	return twodee.SpriteConfig{

@@ -23,6 +23,8 @@ build_aesprite spikes01
 build_aesprite bubble
 build_aesprite mouse
 build_aesprite gate
+build_aesprite icons
+build_aesprite icons_desaturated
 build_aesprite tiles
 build_aesprite tiles "assets/tiled"
 cp assets/*.png tmp/
