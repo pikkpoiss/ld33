@@ -203,7 +203,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 			}
 		}
 		if numHit > 0 {
-			l.Grid.UpdateBlockState(pos, placement.Block, BlockScaring, placement.Variant)
+			l.Grid.UpdateBlockState(placement, BlockScaring)
 			switch placement.Block.Title {
 			case "Mr. Bones":
 				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlayMrBonesEffect))
@@ -213,7 +213,7 @@ func (l *Level) updateBlocks(elapsed time.Duration) {
 				l.gameEventHandler.Enqueue(twodee.NewBasicGameEvent(PlaySpikesEffect))
 			}
 		} else {
-			l.Grid.UpdateBlockState(pos, placement.Block, BlockNormal, placement.Variant)
+			l.Grid.UpdateBlockState(placement, BlockNormal)
 		}
 		// Iterate from the back because we're doing some swapping and
 		// don't wish to invalidate the rest of our indices.

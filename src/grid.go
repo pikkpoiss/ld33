@@ -134,13 +134,14 @@ func (g *Grid) DeleteBlock(placement BlockPlacement) (Ivec2, bool) {
 	return placement.Pos, true
 }
 
-func (g *Grid) UpdateBlockState(origin Ivec2, block *Block, state BlockState, variant int) {
+func (g *Grid) UpdateBlockState(placement BlockPlacement, state BlockState) {
 	var (
+		pt   = placement.Pos.Plus(placement.Block.Offset)
 		item *GridItem
 	)
-	for y := 0; y < len(block.Variants[variant]); y++ {
-		for x := 0; x < len(block.Variants[variant][y]); x++ {
-			item = g.Get(origin.Plus(Ivec2{int32(x), int32(y)}))
+	for y := 0; y < len(placement.Block.Variants[placement.Variant]); y++ {
+		for x := 0; x < len(placement.Block.Variants[placement.Variant][y]); x++ {
+			item = g.Get(pt.Plus(Ivec2{int32(x), int32(y)}))
 			if item != nil {
 				item.SetState(state)
 			}
